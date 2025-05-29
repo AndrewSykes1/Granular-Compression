@@ -1,7 +1,9 @@
-% Load and resize image
-raww = imread('imageeee.bmp');  
-raw = imresize(raww, 0.1);
+% Load functions
+addpath('./functions');
 
+% Load and resize image
+unadjusted_raw = imread('./staged_data/imageeee.bmp');  
+raw = imresize(unadjusted_raw, 0.1);
 raws = adapthisteq(raw);
 
 [Nx Ny]=size(raw);       % image size
