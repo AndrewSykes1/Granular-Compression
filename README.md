@@ -1,8 +1,16 @@
-This codebase is for an experiment led by Dr. Peshkov pertaining to how granual matter is effected by compression. 
-In the current stages there is code to:
--Move 2 lasers vertically at a setup of orbeez like particals in triton (with some added dye for visability)
--Record and properly crop a view provided by a camera attatched to a motor
--Turn this video file into a hdf5 image stack, which then is used to find the centers of particals
-This is in hope of being able to determine what effects compression has on particals, namely does position and rotation alter?
-According to other studies, under repetitive compression the position of each partical will not change but the rotation will.
-We hope to replicate that!
+# Granular Matter Compression Experiment
+
+This codebase supports an experiment led by Dr. Peshkov on how granular matter is affected by compression.
+
+## Current Capabilities
+
+- Vertically move two lasers over a setup of Orbeez-like particles suspended in Triton (with added dye for visibility).
+- Record and crop video from a camera attached to a motorized system.
+- Convert video into an HDF5 image stack, which is then used to detect particle centers.
+
+## Purpose
+
+The goal is to study how compression affects particles — particularly changes in position and rotation.
+
+Previous studies suggest that under repeated compression, particle **positions remain unchanged**, but their **rotations vary**.  
+We aim to replicate and verify those findings!
