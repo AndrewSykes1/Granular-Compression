@@ -1,2 +1,0 @@
-imaqhwinfo 
-imaqhwinfo('gentl')
