@@ -1,0 +1,2 @@
+imaqhwinfo 
+imaqhwinfo('gentl')

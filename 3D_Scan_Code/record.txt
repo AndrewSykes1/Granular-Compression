@@ -1,0 +1,27 @@
+Legend: 
+  * - An event occurred.
+  > - A write operation occurred.
+  < - A read operation occurred.
+ 
+1      Recording on 11-Jun-2015 at 15:32:06.533. Binary data in little endian format.
+2      > 8 ascii values.
+3      > 8 ascii values.
+4      < 18 ascii values.
+5      > 5 ascii values.
+6      > 8 ascii values.
+7      < 13 ascii values.
+8      > 12 ascii values.
+9      < 5 ascii values.
+10     > 12 ascii values.
+11     > 12 ascii values.
+12     < 10 ascii values.
+13     > 4 ascii values.
+14     > 8 ascii values.
+15     < 13 ascii values.
+16     > 8 ascii values.
+17     > 10 ascii values.
+18     < 9 ascii values.
+19     > 10 ascii values.
+20     < 9 ascii values.
+21       Recording off.
+
