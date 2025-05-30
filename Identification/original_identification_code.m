@@ -1,4 +1,4 @@
-I = imread('imageeee.bmp');       
+I = imread('./staged_data/imageeee.bmp');       
 I = imresize(I,0.1);
 
 [Nx Ny]=size(I);      
