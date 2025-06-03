@@ -6,10 +6,10 @@ dy=y2-y1+1;%
 no_images=end_image-start_image+1;
 IMS=(zeros(dy,dx,no_images));
 
-filename = strcat('Scan_',num2str(ScanNumber),'.hdf5');
+filename = strcat('DownScan_',num2str(ScanNumber),'.hdf5');
 file=strcat(path,filename);
 
-datasetname = strcat('/RawData/Scan_',num2str(ScanNumber));
+datasetname = strcat('/RawData/Scan_', num2str(ScanNumber));
 
 %Defines indexes for the data to load
 start_index = [x1 y1 start_image];

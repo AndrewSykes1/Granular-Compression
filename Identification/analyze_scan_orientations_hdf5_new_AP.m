@@ -20,6 +20,15 @@ Gauss_sph=single(Gauss_sphere(radius,sigma0,kx,ky,kz,AR_z));
 disp('a_s: Loading and pre-processing images');
 IMS=load_images_hdf5(start_image,end_image,x1,x2,y1,y2,imagefolder,scan_number);
 
+
+figure;
+% Show a middle slice in z:
+mid_z = 50;
+imshow(IMS(:,:,mid_z), []);
+title(['Image slice z = ' num2str(mid_z)]);
+
+
+
 %Adjust level removing upper and lower parts containing no information
 IMS=IMS/4096;
 max_level=0.85;
@@ -57,5 +66,7 @@ Result=zeros(numparticles,3);
 Result(:,1)=x;
 Result(:,2)=y;
 Result(:,3)=z;
+
+fprintf('%d %d %d\n', Result.')
 
 out_as=Result;
