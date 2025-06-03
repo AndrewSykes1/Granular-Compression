@@ -20,7 +20,7 @@ end_image=359; % old: 823        last z slice (top)
 x1=1; %these are limits of the region of interest
 x2=511; % old: 1,1023
 
-y1=1;  % old: 1,1223         %20;%!!both x2-x1+1 must be odd and same for y
+y1=13;  % old: 1,1223         %20;%!!both x2-x1+1 must be odd and same for y
 y2=611;
 
 c1=clock;
