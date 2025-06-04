@@ -69,4 +69,19 @@ Result(:,3)=z;
 
 fprintf('%d %d %d\n', Result.')
 
+% Display particles over their respective z layers one by one
+for i = 1:size(Result,1)
+    xi = Result(i,1);
+    yi = Result(i,2);
+    zi = Result(i,3);
+
+    figure;
+    imshow(IMS(:,:,zi), []);
+    hold on;
+    plot(yi, xi, 'r.', 'MarkerSize', 20); % Note: x is row (vertical), y is column (horizontal)
+    title(['Particle at Z = ' num2str(zi)]);
+    hold off;
+end
+
+
 out_as=Result;
