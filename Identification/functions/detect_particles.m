@@ -1,47 +1,58 @@
-function positions = detect_particles(image_path)
+function positions = detect_particles(image)
+    % Convert to double and enhance contrast
+    img = im2double(image);
+    enhanced_img = adapthisteq(img);
 
-    % Load and preprocess image
-    original_img = imread(image_path);
-    resized_img = imresize(original_img, 0.1);
-    enhanced_img = adapthisteq(resized_img);
+    % Parameters for radius search
+    max_radius = 30;   % max radius to check
+    step_radius = 1;   % radius step size
+    threshold_drop = 0.3; % intensity drop threshold to define edge
 
-    % Image size info
-    [Nx, Ny, ~] = size(original_img);
+    % Find approximate centers using imregionalmax on blurred image
+    bw = imregionalmax(imgaussfilt(enhanced_img,2));
+    [py, px] = find(bw);
 
-    % Intensity normalization thresholds
-    lo = 10;
-    hi = 250;
-    norm_img = (double(enhanced_img) - lo) / (hi - lo);
+    num_centers = length(px);
+    radii = zeros(num_centers,1);
 
-    % Ideal particle specs and grid setup
-    D = 20;       
-    w = 1.3;      
-    ss = 2 * fix(D / 2 + 4 * w / 2) - 1;
-    os = (ss - 1) / 2;
-    [xx, yy] = ndgrid(-os:os, -os:os);
-    r = hypot(xx, yy);
+    % For each center, estimate radius by checking radial intensity drop
+    for k = 1:num_centers
+        x = px(k);
+        y = py(k);
 
-    % Find particle centers (peaks)
-    Cutoff = 5;
-    MinSep = 5;
-    [~, px, py] = findpeaks(1 ./ chiimg(norm_img, ipf(r, D, w)), 1, Cutoff, MinSep);
+        max_r = 0;
+        center_val = enhanced_img(y,x);
 
-    % Scale coordinates to original image size
-    scale_factor = Nx / size(resized_img, 1);
-    px = px * scale_factor;
-    py = py * scale_factor;
+        for r = step_radius:step_radius:max_radius
+            % Sample points on circle perimeter
+            theta = linspace(0, 2*pi, 36);
+            xs = round(x + r*cos(theta));
+            ys = round(y + r*sin(theta));
 
-    % Adjust coordinates to correct fitting
-    adjustment_factor = -100;
-    px = px + adjustment_factor;
-    py = py + adjustment_factor;
+            % Keep points inside image
+            valid = xs > 0 & xs <= size(enhanced_img,2) & ys > 0 & ys <= size(enhanced_img,1);
+            xs = xs(valid);
+            ys = ys(valid);
 
-    % Remove out-of-bounds 
-    valid_mask = (px > 0) & (px <= Nx) & (py > 0) & (py <= Ny);
-    px = px(valid_mask);
-    py = py(valid_mask);
+            % Get intensity values on perimeter
+            vals = arrayfun(@(a,b) enhanced_img(b,a), xs, ys);
 
-    % Return positions as struct with arrays
-    positions.x = px;
-    positions.y = py;
+            % Check if average intensity dropped below threshold relative to center
+            if mean(vals) < center_val - threshold_drop
+                max_r = r;
+                break;
+            end
+        end
+
+        if max_r == 0
+            max_r = max_radius; % max if no drop found
+        end
+
+        radii(k) = max_r;
+    end
+
+    % Return struct with x,y,r
+    positions.x = double(px);
+    positions.y = double(py);
+    positions.r = radii;
 end

@@ -1,17 +1,20 @@
-C_farness = 15; % distance threshold
-layer_range = 3; % how many layers to check up/down
+C_farness = 15;      % distance threshold
+layer_range = 3;     % how many layers up/down to check
 real_dict = containers.Map('KeyType', 'double', 'ValueType', 'any');
 center_dict = containers.Map('KeyType', 'double', 'ValueType', 'any');
 
-% First, detect particles in each layer
+% Assume layer_count and filename/dataset defined earlier
+
 for z = 1:layer_count
-    img = get_image_for_layer(z); % your function to get image z
-    centers = detect_particles(img); % returns struct with x, y, radius
+    img = h5read(filename, dataset, [1 1 z], [info.Dataspace.Size(1), info.Dataspace.Size(2), 1]);
+    if size(img,3) > 1
+        img = rgb2gray(img);
+    end
+    centers = detect_particles(img); % returns struct with x,y,r fields
     center_dict(z) = centers;
-    real_dict(z) = []; % initialize
+    real_dict(z) = [];
 end
 
-% Now, check for local radius maxima
 for z = 1:layer_count
     current = center_dict(z);
     real_particles = [];
@@ -31,7 +34,7 @@ for z = 1:layer_count
                 nx = neighbor.x(j);
                 ny = neighbor.y(j);
                 nr = neighbor.r(j);
-                if norm([cx, cy] - [nx, ny]) < C_farness && nr > cr
+                if norm([cx - nx, cy - ny]) < C_farness && nr > cr
                     is_largest = false;
                     break;
                 end
@@ -46,5 +49,5 @@ for z = 1:layer_count
         end
     end
 
-    real_dict(z) = real_particles; % store retained centers
+    real_dict(z) = real_particles;
 end
