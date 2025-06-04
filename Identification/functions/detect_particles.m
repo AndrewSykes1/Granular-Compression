@@ -1,5 +1,4 @@
 function positions = detect_particles(image_path)
-    addpath('./functions');
 
     % Load and preprocess image
     original_img = imread(image_path);
@@ -37,7 +36,7 @@ function positions = detect_particles(image_path)
     px = px + adjustment_factor;
     py = py + adjustment_factor;
 
-    % Remove out-of-bounds (no padding needed here since returning positions)
+    % Remove out-of-bounds 
     valid_mask = (px > 0) & (px <= Nx) & (py > 0) & (py <= Ny);
     px = px(valid_mask);
     py = py(valid_mask);

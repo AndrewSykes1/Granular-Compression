@@ -1,5 +1,3 @@
-addpath('./functions');
-
 image_path = './staged_data/imageeee.bmp';
 
 % Get particle positions from your function
