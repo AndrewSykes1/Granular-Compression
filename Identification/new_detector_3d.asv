@@ -19,9 +19,7 @@ layer_count = size_array(3);  % if it's depth
 for z = 1:layer_count
     img = h5read(filename, dataset, [1 1 z], [info.Dataspace.Size(1), info.Dataspace.Size(2), 1]);
 
-    if mod(z,300) == 0
-        figure; imshow(img, []);
-    end
+    if mod(z,100) == 0:
 
     fprintf('%d/%d | ',z,layer_count);
     centers = detect_particles(img, z); % returns struct with x,y,r fields

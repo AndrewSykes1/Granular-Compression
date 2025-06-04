@@ -43,14 +43,13 @@ function positions = detect_particles(image, z)
     mask = (px >= padding) & (px <= Nx + padding) & (py >= padding) & (py <= Ny + padding);
 
     % Create a figure to display the original image with overlaid predictions
-    if mod(z, 100) == 0
+    if mod(z, 100) == 0:
         h = figure(z);
         imshow(padded_img);
-        hold on;
-        plot(py(mask), px(mask), 'w.', 'MarkerSize', 10);  % Overlay particle locations as white dots
-        hold off;
-    end
-
+    hold on;
+    plot(py(mask), px(mask), 'w.', 'MarkerSize', 10);  % Overlay particle locations as white dots
+    hold off;
+    
     positions.x = px(mask);
     positions.y = py(mask);
 
