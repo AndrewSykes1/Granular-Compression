@@ -8,11 +8,12 @@ from datetime import datetime
 from skimage.transform import resize
 import os
 
-def load_hdf5_stack(path, dataset_key='RawData/Scan_18'):
+def load_hdf5_stack(path, dataset_key='RawData'):
     with h5py.File(path, 'r') as f:
+        # Adjust to nested dataset key if needed, e.g., 'RawData/Scan_18'
         return np.array(f[dataset_key])
 
-def detect_centers_in_stack(image_stack, output_dir='output_images'):
+def detect_centers_in_stack(image_stack, output_dir='output_figures'):
     model = StarDist2D.from_pretrained('2D_versatile_fluo')
     all_centers = []
 
@@ -22,25 +23,27 @@ def detect_centers_in_stack(image_stack, output_dir='output_images'):
         now = datetime.now()
         print(f"[{now.strftime('%Y-%m-%d %H:%M:%S')}] Processing slice {z+1}/{len(image_stack)}...")
 
-        # Resize to 50%
-        img_resized = resize(img, (img.shape[0]//2, img.shape[1]//2), preserve_range=True)
+        # Resize to 20% of original size
+        img_resized = resize(img, (int(img.shape[0]*0.2), int(img.shape[1]*0.2)), preserve_range=True)
         img_norm = normalize(img_resized, 1, 99.8)
 
         labels, details = model.predict_instances(img_norm)
         centers_2d = details['points']
 
-        # Rescale to original coordinates
-        centers_2d = centers_2d * 2
+        # Rescale centers back to original image size
+        centers_2d = centers_2d / 0.2  # Because resized down by 0.2, so scale centers up by 1/0.2 = 5
 
         for center in centers_2d:
             all_centers.append([center[0], center[1], z])
 
-        # Save visualization
-        plt.figure(figsize=(6, 6))
+        # Plot the original image and overlay predicted centers
+        plt.figure(figsize=(6,6))
         plt.imshow(img, cmap='gray')
         plt.scatter(centers_2d[:, 1], centers_2d[:, 0], c='r', s=10)
         plt.title(f"Slice {z+1} with detected centers")
         plt.axis('off')
+
+        # Save the figure to disk instead of showing it
         plt.savefig(os.path.join(output_dir, f"slice_{z+1:03d}.png"))
         plt.close()
 
@@ -63,7 +66,7 @@ def cluster_3d_points(points, eps=3.0, min_samples=1):
 # === MAIN ===
 if __name__ == '__main__':
     hdf5_path = r'C:\Users\Lab User\Desktop\experiment data\07302024\Scan_18.hdf5'
-    dataset_key = 'RawData/Scan_18'
+    dataset_key = 'RawData/Scan_18'  # Adjust as needed
 
     print("Loading image stack from HDF5...")
     image_stack = load_hdf5_stack(hdf5_path, dataset_key)
@@ -78,11 +81,9 @@ if __name__ == '__main__':
     print(f"Found {len(centers_3d)} 3D particles.")
 
     # Plot clustered 3D centers
-    plt.figure(figsize=(8,6))
     plt.scatter(centers_3d[:, 1], centers_3d[:, 0], c=centers_3d[:, 2], cmap='plasma')
     plt.xlabel("X")
     plt.ylabel("Y")
-    plt.title("3D Particle Centers (Color = Z slice)")
+    plt.title("3D Particle Centers (Color = Z)")
     plt.colorbar(label="Z slice")
-    plt.tight_layout()
     plt.show()
