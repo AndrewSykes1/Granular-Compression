@@ -17,21 +17,17 @@ def detect_particles(image, show=False):
     resized = cv2.resize(original, (0, 0), fx=0.1, fy=0.1)
     
     lo, hi = resized.min(), resized.max()
-    D = 3
+    D = 4
     w = D/6
     Cutoff = 2
 
     norm = (resized.astype(np.float32) - lo) / (hi - lo)
     norm = np.clip(norm, 0, 1)
-    norm_inv = 1 - norm
-    threshold = 0.80
-    scale = 2  # bigger scale
+    norm = 1 - norm
 
-    norm_inv = np.where(norm_inv > threshold, (norm_inv - threshold) * scale, 0)
-    norm_inv = np.clip(norm_inv, 0, 1)
-    plt.imshow(norm_inv, cmap='gray')
+
+    plt.imshow(norm, cmap='gray')
     plt.show()
-    norm = norm_inv
     #norm = equalize_adapthist(norm_inv)
 
     plt.imshow(norm, cmap='gray')
@@ -42,6 +38,8 @@ def detect_particles(image, show=False):
     xx, yy = np.meshgrid(np.arange(-os, os+1), np.arange(-os, os+1))
     r = np.hypot(xx, yy)
     template = ipf(r, D, w)
+    template = 1 - template
+
 
     conv = 1 / (chiimg(norm, template) + 1e-6)
 

@@ -1,7 +1,7 @@
-addpath('./functions');
+addpath('C:\Users\Lab User\Granular-Compression\Identificatio\functions');
 
 % Load and preprocess image
-original_img = imread('./staged_data/imageeee.bmp');
+original_img = imread('C:\Users\Lab User\Granular-Compression\Identification\staged_data\imageeee.bmp');
 resized_img = imresize(original_img, 0.1);
 enhanced_img = adapthisteq(resized_img);
 
