@@ -7,6 +7,10 @@ import h5py
 from datetime import datetime
 from skimage.transform import resize
 import os
+from mpl_toolkits.mplot3d import Axes3D
+import plotly.graph_objects as go
+import sys
+
 
 def load_hdf5_stack(path, dataset_key='RawData'):
     with h5py.File(path, 'r') as f:
@@ -20,8 +24,12 @@ def detect_centers_in_stack(image_stack, output_dir='output_figures'):
     os.makedirs(output_dir, exist_ok=True)
 
     for z, img in enumerate(image_stack):
+
+        CLEAR_PREVIOUS_LINE = '\033[F\033[K'  # \033[F = move cursor up, \033[K = clear line
+        sys.stdout.write(CLEAR_PREVIOUS_LINE)  # Remove previous "Processing slice..." line
         now = datetime.now()
-        print(f"[{now.strftime('%Y-%m-%d %H:%M:%S')}] Processing slice {z+1}/{len(image_stack)}...")
+        msg = f"[{now.strftime('%Y-%m-%d %H:%M:%S')}] Processing slice {z+1}/{len(image_stack)}..."
+        print(msg)
 
         # Resize to 20% of original size
         img_resized = resize(img, (int(img.shape[0]*0.2), int(img.shape[1]*0.2)), preserve_range=True)
@@ -87,3 +95,36 @@ if __name__ == '__main__':
     plt.title("3D Particle Centers (Color = Z)")
     plt.colorbar(label="Z slice")
     plt.show()
+
+    xs = centers_3d[:, 1]
+    ys = centers_3d[:, 0]
+    zs = centers_3d[:, 2]
+    
+    fig = go.Figure(data=[go.Scatter3d(
+        x=xs,
+        y=ys,
+        z=zs,
+        mode='markers',
+        marker=dict(
+            size=5,
+            color=zs,                # color by Z slice
+            colorscale='Viridis',
+            opacity=0.8
+        )
+    )])
+    
+    fig.update_layout(
+        scene=dict(
+            xaxis_title='X',
+            yaxis_title='Y',
+            zaxis_title='Z (Slice)'
+        ),
+        title='3D Particle Centers',
+        width=800,
+        height=800
+    )
+    
+    # Save to HTML file
+    html_file = '3d_particle_centers.html'
+    fig.write_html(html_file)
+    print(f"3D interactive plot saved to {html_file}")
