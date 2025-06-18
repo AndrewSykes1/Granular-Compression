@@ -36,7 +36,7 @@ numberOfScans = length(motionSeries);
 % -------------------------------------------------------------------------
 % -------------------------------------------------------------------------
 %Input Save Settings and create directory
-target_folder = 'C:\Users\Lab User\Desktop\experiment data\07312024\';
+target_folder = 'C:\Users\Lab User\Desktop\experiment data\07312027\';
 mkdir(target_folder);
 
 %Prep Laser and Camera Motors
@@ -123,7 +123,7 @@ moveto(s2,camera_back_targetlocation);
 
 %execute series of scans
 tic
-for cycleNum = 92:NumberOfCycles
+for cycleNum = 98:NumberOfCycles
 cntr = cycleNum*2 + 1;
 for scanNumber = 1:numberOfScans
     
@@ -164,11 +164,11 @@ for scanNumber = 1:numberOfScans
 
     %end
 
-
+    %FIX
     %wait for long enough for the motors to move
     timeNeeded = (CompressionDistance*25.4)/CompressionSpeed;
     timeSinceMotorStart = max(cputime - motionStartTime, 0);
-    pause((200)); %timeNeeded - timeSinceMotorStart
+    pause((50)); %timeNeeded - timeSinceMotorStart
 
     %Estimate times
     ElapsedTime=toc;
