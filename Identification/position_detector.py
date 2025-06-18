@@ -115,8 +115,8 @@ def cluster_3d_points(points, eps=13.0, min_samples=4):
 
 if __name__ == '__main__':
     # Set input file and dataset path
-    scan = '19'
-    hdf5_path = rf'C:\Users\Lab User\Desktop\experiment data\07292024\Scan_{scan}.hdf5'
+    scan = '47'
+    hdf5_path = rf'C:\Users\Lab User\Desktop\experiment data\07162024\Scan_{scan}.hdf5'
     dataset_key = f'RawData/Scan_{scan}'
 
     # Create output directory
