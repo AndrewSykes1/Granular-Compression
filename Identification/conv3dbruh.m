@@ -156,11 +156,22 @@ title('Detected particle centers');
 
 % Rescale data
 peaks = [py(:), px(:), pz(:)] ./ scaleFactor;
-dataFinal = imresize3(dataRescale, cropSz);
+dataFinal = imresize3(dataRescale, 1/scaleFactor, 'linear');
 
 % Save prediction data
-save(strcat('Peaks_', scanName, '.mat'), 'peaks');
-save(strcat('Volume_', scanName, '.mat'), 'dataFinal');
+peakLoc = strcat('./DataOutput/','Peaks_', scanName, '.mat');
+volLoc = strcat('./DataOutput/','Volume_', scanName, '.mat');
+
+
+if ~exist('DataOutput', 'Dir')
+    mkdir('DataOutput');
+end
+if isfile(peakLoc) && isfile(volLoc)
+    delete peakLoc; delete volLoc;
+end
+
+save(peakLoc, 'peaks'); 
+save(volLoc, 'dataFinal');
 fprintf("Saved predictions\n")
 
 fprintf("Time to run: %.2f min | %d%%\n", toc/60, scaleFactor*100);
