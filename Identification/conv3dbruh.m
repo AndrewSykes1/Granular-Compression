@@ -159,19 +159,16 @@ peaks = [py(:), px(:), pz(:)] ./ scaleFactor;
 dataFinal = imresize3(dataRescale, 1/scaleFactor, 'linear');
 
 % Save prediction data
-peakLoc = strcat('./DataOutput/','Peaks_', scanName, '.mat');
-volLoc = strcat('./DataOutput/','Volume_', scanName, '.mat');
+outDir = fullfile(pwd,'DataOutput');
+if ~exist(outDir, 'dir'), mkdir(outDir); end
 
-
-if ~exist('DataOutput', 'Dir')
-    mkdir('DataOutput');
-end
-if isfile(peakLoc) && isfile(volLoc)
-    delete peakLoc; delete volLoc;
-end
+peakLoc = fullfile(outDir, ['Peaks_', scanName, '.mat']);
+volLoc  = fullfile(outDir, ['Volume_', scanName, '.mat']);
 
 save(peakLoc, 'peaks'); 
-save(volLoc, 'dataFinal');
+volume = dataFinal;        % keep variable in workspace
+save(volLoc, 'volume');    % save under a clear name
+
 fprintf("Saved predictions\n")
 
 fprintf("Time to run: %.2f min | %d%%\n", toc/60, scaleFactor*100);
