@@ -83,3 +83,152 @@ def cidp23D(cxyz, over, di, Np, D, w):
         if stepMag > maxdr: dp = dp/max(stepMag,1e-12)*maxdr
         dpx[np_idx], dpy[np_idx], dpz[np_idx] = dp
     return dpx, dpy, dpz
+
+def CircleOverlap(c1, c2):
+    x1, y1, r1 = c1
+    x2, y2, r2 = c2
+    d = hypot(x1 - x2, y1 - y2)
+
+    if d >= r1 + r2:  # No overlap
+        return 0.0
+    if d <= abs(r1 - r2):  # One inside the other
+        return (pi * min(r1, r2)**2) / (pi * max(r1, r2)**2)
+
+    r1_sq = r1**2
+    r2_sq = r2**2
+
+    alpha = acos((d**2 + r1_sq - r2_sq) / (2 * d * r1))
+    beta = acos((d**2 + r2_sq - r1_sq) / (2 * d * r2))
+
+    area1 = r1_sq * alpha
+    area2 = r2_sq * beta
+    area3 = 0.5 * sqrt((-d + r1 + r2) * (d + r1 - r2) * (d - r1 + r2) * (d + r1 + r2))
+
+    intersection = area1 + area2 - area3
+    union = pi * r1_sq + pi * r2_sq - intersection
+    return intersection / union
+
+def CircleDetection(
+    img,
+    min_r=10,
+    max_r=60,
+    step=2,
+    sigma=2.75,
+    threshold=100,
+    iou_thresh=0.25
+):
+
+    # Step 1: Edge detection
+    img = img_as_ubyte(img)
+    edges = canny(img, sigma=sigma)
+    h, w = edges.shape
+
+    # Step 2: Accumulator setup
+    radii = np.arange(min_r, max_r, step)
+    num_radii = len(radii)
+    accumulator = np.zeros((h, w, num_radii), dtype=np.uint64)
+
+    # Step 3: Precompute circle perimeters
+    theta = np.arange(0, 2 * pi, pi / 180)
+    circle_perimeters = {
+        r_index: (
+            np.round(r * np.cos(theta)).astype(int),
+            np.round(r * np.sin(theta)).astype(int)
+        )
+        for r_index, r in enumerate(radii)
+    }
+
+    # Step 4: Voting
+    y_idxs, x_idxs = np.nonzero(edges)
+    for r_index in range(num_radii):
+        dx, dy = circle_perimeters[r_index]
+        for x, y in zip(x_idxs, y_idxs):
+            x_c = x - dx
+            y_c = y - dy
+            valid = (x_c >= 0) & (x_c < w) & (y_c >= 0) & (y_c < h)
+            accumulator[y_c[valid], x_c[valid], r_index] += 1
+
+    # Step 5: Candidate detection with local maxima and cross-radius validation
+    candidates = []
+    for r_index, r in enumerate(radii):
+        acc_slice = accumulator[:, :, r_index]
+        local_max = (maximum_filter(acc_slice, size=5) == acc_slice)
+        mask = (acc_slice > threshold) & local_max
+        coords = np.argwhere(mask)
+
+        for y, x in coords:
+            val = acc_slice[y, x]
+            # Cross-radius consistency check
+            neighbors = []
+            for offset in [-2, -1, 1, 2]:
+                neighbor_idx = r_index + offset
+                if 0 <= neighbor_idx < num_radii:
+                    neighbors.append(accumulator[y, x, neighbor_idx])
+            if all(val > n for n in neighbors):
+                candidates.append((x, y, r, val))
+
+    # Step 6: Final filtering using IoU
+    final_circles = []
+    for x, y, r, val in sorted(candidates, key=lambda c: -c[3]):  # highest votes first
+        this_circle = (x, y, r)
+        keep = True
+        for fx, fy, fr in final_circles:
+            if CircleOverlap(this_circle, (fx, fy, fr)) > iou_thresh:
+                keep = False
+                break
+        if keep:
+            final_circles.append(this_circle)
+    
+    
+
+    return final_circles
+
+def find_peaks(a):
+  x = np.array(a)
+  max = np.max(x)
+  length = len(a)
+  ret = []
+  for i in range(length):
+      ispeak = True
+      if i-1 > 0:
+          ispeak &= (x[i] > 1.8 * x[i-1])
+      if i+1 < length:
+          ispeak &= (x[i] > 1.8 * x[i+1])
+    
+      ispeak &= (x[i] > 0.05 * max)
+      if ispeak:
+          ret.append(i)
+  return ret
+
+def RemoveArtifacts(img, circles, radius_padding=3):
+
+    cleaned = img.copy()
+    gradient = sobel(img)
+
+    for x, y, r in circles:
+        # Step 1: Create initial mask from circle
+        rr, cc = disk((y, x), r - radius_padding, shape=img.shape)
+        init_mask = np.zeros(img.shape, dtype=bool)
+        init_mask[rr, cc] = True
+
+        # Step 2: Refine region using active contour
+        snake = mgac(
+            gradient,        # image
+            1,              # iterations
+            init_mask,       # initial level set
+            smoothing=1,
+            threshold='auto',
+            balloon=-5
+        )
+        refined_mask = snake > 0.5
+
+        # Step 3: Fill internal noise (e.g., laser lines) inside the particle
+        region_vals = img[refined_mask]
+        counts, bin_edges = np.histogram(region_vals.flatten(), bins = 20)
+        common_val_idx = np.argmax(counts)
+        common_val = bin_edges[common_val_idx]
+        
+        noise = (refined_mask & (img < common_val - 0.05))
+        cleaned[noise] = common_val*1.2
+
+    return cleaned
