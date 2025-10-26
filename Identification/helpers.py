@@ -108,6 +108,15 @@ def CircleOverlap(c1, c2):
     union = pi * r1_sq + pi * r2_sq - intersection
     return intersection / union
 
+def CircleOverlap(c1, c2):
+    # simple IoU-like overlap (replace with your actual implementation)
+    x1, y1, r1 = c1
+    x2, y2, r2 = c2
+    d = np.hypot(x1 - x2, y1 - y2)
+    if d > r1 + r2:
+        return 0.0
+    return 1.0 - d / (r1 + r2)
+
 def CircleDetection(
     img,
     min_r=10,
@@ -117,38 +126,42 @@ def CircleDetection(
     threshold=100,
     iou_thresh=0.25
 ):
-
     # Step 1: Edge detection
-    img = img_as_ubyte(img)
+    img = img
     edges = canny(img, sigma=sigma)
     h, w = edges.shape
 
-    # Step 2: Accumulator setup
+    # Step 2: Radii
     radii = np.arange(min_r, max_r, step)
     num_radii = len(radii)
-    accumulator = np.zeros((h, w, num_radii), dtype=np.uint64)
 
-    # Step 3: Precompute circle perimeters
+    # Step 3: Precompute circle perimeters (stacked)
     theta = np.arange(0, 2 * pi, pi / 180)
-    circle_perimeters = {
-        r_index: (
-            np.round(r * np.cos(theta)).astype(int),
-            np.round(r * np.sin(theta)).astype(int)
-        )
-        for r_index, r in enumerate(radii)
-    }
+    cos_t, sin_t = np.cos(theta), np.sin(theta)
+    dx_all = np.round(radii[:, None] * cos_t).astype(int)
+    dy_all = np.round(radii[:, None] * sin_t).astype(int)
 
-    # Step 4: Voting
-    y_idxs, x_idxs = np.nonzero(edges)
-    for r_index in range(num_radii):
-        dx, dy = circle_perimeters[r_index]
-        for x, y in zip(x_idxs, y_idxs):
-            x_c = x - dx
-            y_c = y - dy
-            valid = (x_c >= 0) & (x_c < w) & (y_c >= 0) & (y_c < h)
-            accumulator[y_c[valid], x_c[valid], r_index] += 1
+    # Step 4: Voting (vectorized)
+    y_idxs, x_idxs = np.nonzero(edges)  # edge points (N,)
+    N = len(x_idxs)
 
-    # Step 5: Candidate detection with local maxima and cross-radius validation
+    # Expand edge coords against circle offsets
+    # Shape: (num_radii, N, num_theta)
+    x_c = x_idxs[None, :, None] - dx_all[:, None, :]
+    y_c = y_idxs[None, :, None] - dy_all[:, None, :]
+
+    # Keep only valid centers
+    valid = (x_c >= 0) & (x_c < w) & (y_c >= 0) & (y_c < h)
+
+    # Flatten into 1D indices for bincount
+    flat_idx = (y_c * w + x_c) * num_radii + np.arange(num_radii)[:, None, None]
+    flat_idx = np.where(valid, flat_idx, -1).ravel()
+
+    flat_idx = flat_idx[flat_idx >= 0]  # remove invalid
+
+    accumulator = np.bincount(flat_idx, minlength=h * w * num_radii).reshape(h, w, num_radii)
+
+    # Step 5: Candidate detection
     candidates = []
     for r_index, r in enumerate(radii):
         acc_slice = accumulator[:, :, r_index]
@@ -156,20 +169,20 @@ def CircleDetection(
         mask = (acc_slice > threshold) & local_max
         coords = np.argwhere(mask)
 
-        for y, x in coords:
-            val = acc_slice[y, x]
-            # Cross-radius consistency check
-            neighbors = []
-            for offset in [-2, -1, 1, 2]:
-                neighbor_idx = r_index + offset
-                if 0 <= neighbor_idx < num_radii:
-                    neighbors.append(accumulator[y, x, neighbor_idx])
-            if all(val > n for n in neighbors):
-                candidates.append((x, y, r, val))
+        if coords.size > 0:
+            vals = acc_slice[coords[:, 0], coords[:, 1]]
+            for (y, x), val in zip(coords, vals):
+                neighbors = []
+                for offset in [-2, -1, 1, 2]:
+                    neighbor_idx = r_index + offset
+                    if 0 <= neighbor_idx < num_radii:
+                        neighbors.append(accumulator[y, x, neighbor_idx])
+                if all(val > n for n in neighbors):
+                    candidates.append((x, y, r, val))
 
-    # Step 6: Final filtering using IoU
+    # Step 6: IoU filtering
     final_circles = []
-    for x, y, r, val in sorted(candidates, key=lambda c: -c[3]):  # highest votes first
+    for x, y, r, val in sorted(candidates, key=lambda c: -c[3]):
         this_circle = (x, y, r)
         keep = True
         for fx, fy, fr in final_circles:
@@ -178,8 +191,6 @@ def CircleDetection(
                 break
         if keep:
             final_circles.append(this_circle)
-    
-    
 
     return final_circles
 
