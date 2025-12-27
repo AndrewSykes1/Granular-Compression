@@ -1,9 +1,11 @@
 import os
 import h5py
 import numpy as np
+import matplotlib.pyplot as plt
 
 from scipy.ndimage import zoom
-import matplotlib.pyplot as plt
+from Helpers.saveData import saveData
+
 
 
 def downscale_data(filePath, dataPath):
