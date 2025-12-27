@@ -1,5 +1,4 @@
 DataOutput/
 __pycache__/
-processed_162.hdf5
-Scan_162.hdf5
 Data/
+.venv/
