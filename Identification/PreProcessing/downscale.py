@@ -4,8 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from scipy.ndimage import zoom
-from Helpers.saveData import saveData
-
+from Helpers import saveData
 
 
 def downscale_data(filePath, dataPath):
