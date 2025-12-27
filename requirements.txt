@@ -1,0 +1,7 @@
+numpy
+scipy
+h5py
+napari
+qtpy
+PyQt5
+matplotlib
