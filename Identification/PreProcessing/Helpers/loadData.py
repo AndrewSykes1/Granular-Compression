@@ -11,6 +11,7 @@ def loadData(location, fileName, database='default'):
 
     Example:
         >>> data = loadData(location = r"C:\Users\Lab User\Desktop\temp1\Granular-Compression\Data", fileName = "downscale_17.hdf5")
+        >>> data = loadData(r'/home/snow/Coding/Granular-Compression/Data','downscale_17.hdf5')
     """
 
     # File location
@@ -18,7 +19,6 @@ def loadData(location, fileName, database='default'):
 
     # Load and unflatten file
     with h5py.File(f'{path}','r') as f: 
-        print(f.keys())
         data = f[database][()] # (slices, rows, width)
         data = data.reshape(f.attrs["shape"])
     
