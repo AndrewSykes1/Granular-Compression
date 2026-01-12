@@ -14,6 +14,7 @@ def dataSizes(vars, type=np.ndarray):
 
     sizeInfo = {name:obj.nbytes for name,obj in vars
             if not name.startswith('_') and isinstance(obj,type)}
+    sizeInfo = dict(sorted(sizeInfo.items(), key=lambda x: x[1], reverse=True))
     
     sizes = {'Mb':[f'{sizeInfo[name]/(1024**2):.0f}' for name in sizeInfo.keys()],
             'Gb':[f'{sizeInfo[name]/(1024**3):.1f}' for name in sizeInfo.keys()]}
