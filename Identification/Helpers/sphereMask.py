@@ -1,20 +1,24 @@
 import numpy as np
 
-def sphereMask(shape, D=100, scale=1):
+def sphereMask(diameter, pad, scale=1):
     """
     Creates a binary sphere mask centered at the origin (0,0,0)
     
     Parameters:
-    :param shape: Desired dimensions of array as a list
-    :param D: Diameter of particle in reality scan 
-    :param scale: How downscaled scan is compared to reality (.25 implies OG*.25=Scan)
+    :param diameter: Diameter of particle in reality
+    :param pad: Desired blank side padding 
+    :param scale: Downscaled magnitude compared to reality (.25 => OG*.25=Scan)
     """
-    l = 25
-    r = 20
+    
+    diameter = np.round(diameter*scale,0)
+    pad = round(pad*(2*scale),0)
+    wall = diameter/2+pad
 
-    x,y,z = np.ogrid[-l:l,-l:l,-l:l]
-    gri = np.sqrt(x**2+y**2+z**2)
-    gri[gri > r] = 0
-    gri[gri != 0] = 1
-        
+    x,y,z = np.ogrid[-wall:wall,-wall:wall,-wall:wall]
+    mask = np.sqrt(x**2+y**2+z**2)
+    a,b,c = mask.shape
+    mask[mask > diameter/2] = 0
+    mask[mask != 0] = 255
+    mask[int(a/2),int(b/2),int(c/2)] = 255
+    
     return mask
