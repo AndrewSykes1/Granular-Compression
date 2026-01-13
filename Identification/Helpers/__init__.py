@@ -4,3 +4,5 @@ from .medi import medi
 from .axialNormalization import axialNormalization
 from .sharpen import sharpen
 from .multiplot import multiplot
+from .sphereMask import sphereMask
+from .dataSizes import dataSizes
