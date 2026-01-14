@@ -6,9 +6,11 @@ from IPython.display import display
 
 def chunkor(data,kernel):
     """
-    Docstring for chunkor
+    Takes data and partitions it in 2 or 4 chunks wrt server and desktop gpu, 
+    returning a padded, chunked list of the data; and a padded kernel, all in pytorch tensors.
     
-    :param data: Description
+    :param data: Default data to be processed
+    :param kernel: An oddxoddxodd np array
     """
 
     device = torch.cuda.get_device_name()
@@ -49,5 +51,6 @@ def chunkor(data,kernel):
                   upper[:,int(c/2)-pads:c,:]]
     
     pchunks = [F.pad(torch.from_numpy(chunk), pad=(pads,)*6) for chunk in chunks]
+    pkernel =  F.pad(torch.from_numpy(kernel, pad=(pads,)*6))
 
-    return pchunks
+    return pchunks, pkernel
