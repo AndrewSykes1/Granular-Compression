@@ -28,8 +28,8 @@ def chunkor(data,kernel):
     df = pd.DataFrame([np.round(item/(1024**3),2) for item in info],
                       index=['Total','Reserved','Allocated'],columns=['VRam'])
 
-    assert all(i % 2 == 1 for i in kernel.shape), 'Kernel dimensions must be odd!'
-    assert all(i % 2 == 0 for i in data.shape), 'Data dimensions must be even!'
+    assert all(i % 2 == 1 for i in kernel.shape), 'Kernel dimensions must be odd'
+    assert all(i % 2 == 1 for i in data.shape), 'Data dimensions must be odd'
 
     print(f'{client} device detected: {device}')
     print(f'Data Ram: {np.round(data.nbytes/(1024**3),2)} GB')
