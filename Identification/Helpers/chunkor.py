@@ -51,6 +51,6 @@ def chunkor(data,kernel):
                   upper[:,int(c/2)-pads:c,:]]
     
     pchunks = [F.pad(torch.from_numpy(chunk), pad=(pads,)*6) for chunk in chunks]
-    pkernel =  F.pad(torch.from_numpy(kernel, pad=(pads,)*6))
+    pkernel =  F.pad(torch.from_numpy(kernel), pad=(pads,)*6)
 
     return pchunks, pkernel
