@@ -14,7 +14,7 @@ def sphereMask(diameter, pad, scale=1):
     pad = round(pad*(2*scale),0)
     wall = diameter/2+pad
 
-    x,y,z = np.ogrid[-wall:wall,-wall:wall,-wall:wall]
+    x,y,z = np.ogrid[-wall:wall+1,-wall:wall+1,-wall:wall+1]
     mask = np.sqrt(x**2+y**2+z**2)
     a,b,c = mask.shape
     mask[mask > diameter/2] = 0
