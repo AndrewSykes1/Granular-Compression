@@ -38,22 +38,19 @@ def chunkor(data,kernel):
     r,c,z = data.shape
     pads = int(kernel.shape[0]/2)
 
-    lower = data[:,:,0:int(z/2)+pads] # Lower Half
-    upper = data[:,:,int(z/2)-pads:z] # Upper Half
-
-    if cuts==1:
-        chunks = [lower,upper]
-    elif cuts == 2:
-        chunks = [lower[:,0:int(c/2)+pads,:],
-                  lower[:,int(c/2)-pads:c,:],
-                  upper[:,0:int(c/2)+pads,:],
-                  upper[:,int(c/2)-pads:c,:]]
+    upper = data[:,:,int(z/2)-pads:z] # U:
+    lower = data[:,:,0:int(z/2)+pads] # L:
     
+    if cuts==1:
+        chunks = [upper,lower] # U:, L:
+    elif cuts == 2:
+        chunks = [upper[:,int(c/2)-pads:c,:], upper[:,0:int(c/2)+pads,:], #UU, UL
+                  lower[:,int(c/2)-pads:c,:], lower[:,0:int(c/2)+pads,:]] #LU, LL
+    
+    print(chunks[0].shape)
     pchunks = [F.pad(torch.from_numpy(chunk), pad=(pads,)*6) for chunk in chunks]
     padding = tuple([[pchunks[0].numpy().shape[int(i/2)]-kernel.shape[int(i/2)] if i % 2 == 0 else 0 for i in range(6)][i] for i in [4,5,2,3,0,1]])
     pkernel =  F.pad(torch.from_numpy(kernel), pad=padding)
+    print(pchunks[0].shape)
 
-    print(f'Chunk shape:  {pchunks[0].shape}')
-    print(f'Kernel shape: {pkernel.shape}')
-
-    return pchunks, pkernel
+    return pchunks, pkernel, cuts
