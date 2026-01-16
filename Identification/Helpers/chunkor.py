@@ -13,6 +13,8 @@ def chunkor(data,kernel):
     :param kernel: An oddxoddxodd np array
     """
 
+    assert all(coord % 2 == 0 for coord in data.shape), 'Data dimensions must all be even.' 
+
     device = torch.cuda.get_device_name()
     if device == 'NVIDIA RTX A2000 12GB':
         client = 'Desktop'
@@ -26,10 +28,7 @@ def chunkor(data,kernel):
             torch.cuda.memory_allocated(0)]
 
     df = pd.DataFrame([np.round(item/(1024**3),2) for item in info],
-                      index=['Total','Reserved','Allocated'],columns=['VRam'])
-
-    assert all(i % 2 == 1 for i in kernel.shape), 'Kernel dimensions must be odd'
-    assert all(i % 2 == 1 for i in data.shape), 'Data dimensions must be odd'
+                       index=['Total','Reserved','Allocated'],columns=['VRam'])
 
     print(f'{client} device detected: {device}')
     print(f'Data Ram: {np.round(data.nbytes/(1024**3),2)} GB')
@@ -51,6 +50,10 @@ def chunkor(data,kernel):
                   upper[:,int(c/2)-pads:c,:]]
     
     pchunks = [F.pad(torch.from_numpy(chunk), pad=(pads,)*6) for chunk in chunks]
-    pkernel =  F.pad(torch.from_numpy(kernel), pad=(pads,)*6)
+    padding = tuple([[pchunks[0].numpy().shape[int(i/2)]-kernel.shape[int(i/2)] if i % 2 == 0 else 0 for i in range(6)][i] for i in [4,5,2,3,0,1]])
+    pkernel =  F.pad(torch.from_numpy(kernel), pad=padding)
+
+    print(f'Chunk shape:  {pchunks[0].shape}')
+    print(f'Kernel shape: {pkernel.shape}')
 
     return pchunks, pkernel
