@@ -18,11 +18,12 @@ def multiplot(*args, plots=None, size=(7,7), color='grey', titles=None, ax_vis=F
         >>> multiplot(img1,img2,img3,img4, plots=(2,2)
     """
 
+    # Set figure grid size
     rows,cols = 1,len(args)
     if plots != None:
         rows,cols = plots
             
-    
+    # Create subplots and set settings
     fig, axs = plt.subplots(nrows=rows,ncols=cols,figsize=size)
     axs = axs.ravel()
     for i,img in enumerate(args):
@@ -32,7 +33,6 @@ def multiplot(*args, plots=None, size=(7,7), color='grey', titles=None, ax_vis=F
         if ax_vis == False:
             axs[i].axis('off')
     fig.tight_layout()
-    
 
     plt.show()
 

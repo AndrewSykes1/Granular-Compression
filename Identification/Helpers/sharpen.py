@@ -11,6 +11,7 @@ def sharpen(data, std=3, strength=0.2):
     :param strength: How strongly the blur reduction should apply
     """
 
+    # Apply gaussian blur
     blurred = gaussian_filter(data, sigma=std)
     dataSharp = np.clip(data - strength*blurred, 0, 1)
     #redistribute = np.clip(exposure.rescale_intensity(dataSharp, in_range='image', out_range=(0,1)), 0, 1)

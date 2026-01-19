@@ -8,9 +8,6 @@ def axialNormalization(data, axis='c'):
 
     :param data: Data to be averaged with, assumes data is of form (r,c,z)
     :param axis: Axis desired to eventually be rescaled
-
-    Example:
-    >>> 
     """
 
     sR,sC,sZ = np.shape(data)
