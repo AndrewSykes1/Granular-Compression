@@ -6,4 +6,5 @@ from .sharpen import sharpen
 from .multiplot import multiplot
 from .sphereMask import sphereMask
 from .dataSizes import dataSizes
-from .chunkor import chunkor
+from .chunker import chunker
+from .unchunker import unchunker
