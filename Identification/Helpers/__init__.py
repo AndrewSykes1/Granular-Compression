@@ -8,3 +8,4 @@ from .sphereMask import sphereMask
 from .dataSizes import dataSizes
 from .chunker import chunker
 from .unchunker import unchunker
+from .kernelPad import kernelPad
