@@ -1,7 +1,11 @@
-def padder(data, device):
+def padder(kPadList):
     """
-    Adds kernel padding and blank padding to data
+    Adds blank padding to data.
     
-    :param data: Description
-    :param device: Description
+    :param kPadList: List of chunks obtained from chunker.py
     """
+
+    if len(kPadList) == 2:
+    
+    elif len(kPadList) == 4:
+        
