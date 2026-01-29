@@ -1,4 +1,5 @@
 import numpy as np
+
 def chunker(data, kP, device):
     """
     Chunks data into proper sizes depending on the device. 

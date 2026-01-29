@@ -1,4 +1,5 @@
 import numpy as np
+
 def unchunker(chunks,kP,sZ):
     """
     Recombines kernel and padded chunks into their original stack and returns default data.
@@ -13,11 +14,27 @@ def unchunker(chunks,kP,sZ):
         raise NotImplementedError
     elif len(chunks) == 4:
         ll,ul,lu,uu = chunks
-        columnComb1 = np.concatenate((ll[:,:int(c/2),:],lu[:,kP:,:]),axis=1)
-        columbComb2 = np.concatenate((ul[:,:int(c/2),:],uu[:,kP:,:]),axis=1)
-        zedComb = np.concatenate((columnComb1[:,:,:int(z/2)],
-                                  columbComb2[:,:,kP:]),
-                                  axis=2)
+        ll_unpad = ll[kP:-kP, kP:-kP, kP:-kP]  # Now shape (r, 266, z_chunk)
+        ul_unpad = ul[kP:-kP, kP:-kP, kP:-kP]
+        lu_unpad = lu[kP:-kP, kP:-kP, kP:-kP]  
+        uu_unpad = uu[kP:-kP, kP:-kP, kP:-kP]
+        columnComb1 = np.concatenate(
+            (ll_unpad[:, :int(c/2), :],      # First 256 columns from ll
+             lu_unpad[:, -int(c/2):, :]),    # Last 256 columns from lu
+            axis=1
+        )
+        columnComb2 = np.concatenate(
+            (ul_unpad[:, :int(c/2), :],      
+             uu_unpad[:, -int(c/2):, :]),    
+            axis=1
+        )
+        
+        # Same logic for z-axis
+        zedComb = np.concatenate(
+            (columnComb1[:, :, :int(z/2)],   
+             columnComb2[:, :, -int(z/2):]), 
+            axis=2
+        )
     
     default = zedComb[kP:-kP,kP:-kP,kP:-kP]
     return default
