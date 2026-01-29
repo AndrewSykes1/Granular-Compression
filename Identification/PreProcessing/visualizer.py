@@ -7,5 +7,5 @@ import napari
 from qtpy.QtWidgets import QSlider, QVBoxLayout, QWidget, QLabel
 from qtpy.QtCore import Qt
 from scipy.ndimage import zoom
-from DataViewer import DataViewer
+from Identification.Legacy.DataViewer import DataViewer
 
