@@ -9,3 +9,4 @@ from .dataSizes import dataSizes
 from .chunker import chunker
 from .unchunker import unchunker
 from .kernelPad import kernelPad
+from .visualizer import visualizer
