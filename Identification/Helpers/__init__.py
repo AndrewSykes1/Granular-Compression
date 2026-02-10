@@ -10,3 +10,8 @@ from .chunker import chunker
 from .unchunker import unchunker
 from .kernelPad import kernelPad
 from .visualizer import visualizer
+
+from .particleGrid import particleGrid
+from .idealParticleGrid import idealParticleGrid
+from .dwOptimizer import dwOptimizer
+from .posOptimizer import posOptimizer
