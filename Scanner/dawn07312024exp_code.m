@@ -11,40 +11,41 @@ LoLimY=0;
 % YResolution = UpLimY-LoLimY+1;
 
 %Input Parameters For Scan Calculations
-scan_distance = 90; %in mm, the height of laser scanning
-volume_length= 15.3 / 2.54; %in inches, the length of the current compression box
-pixel_width = volume_length*25.4/Width; %in mm, the correspondance between pixel size and real distance
-refraction_index = 1.49; %used to calculate relative speed of camera and laser motors
-exposure_time = 50; %in ms
-NumberOfCycles = 100; %In number of cycles, of those the first ten and the last ten would be high resolution ones.
+scan_distance = 90;                       %in mm, the height of laser scanning
+volume_length= 15.3 / 2.54;               %in inches, the length of the current compression box
+pixel_width = volume_length*25.4/Width;   %in mm, the correspondance between pixel size and real distance
+refraction_index = 1.49;                  %used to calculate relative speed of camera and laser motors
+exposure_time = 50;                       %in ms
+NumberOfCycles = 100;                     %In number of cycles, of those the first ten and the last ten would be high resolution ones.
 
-% -------------------------------------------------------------------------
-% -------------------------------------------------------------------------
+
+
 %Input Parameters for compression cell motion
-CompressionSpeed = 0.05; % In mm per second
-CompressionPercent= 1; %Relative to the "current" size of container
+CompressionSpeed = 0.05;                                     % In mm per second
+CompressionPercent= 1;                                       %Relative to the "current" size of container
 CompressionDistance=volume_length*CompressionPercent/100.0;
-%CompressionDistance=0.15 / 2.54;
+
 %Compute compression steps, 1 rev = 1/10 inch, and we have 51200 steps/rev
 CompressionSteps=floor(CompressionDistance*10*51200);
+
 %Make first 16 images per compression cycle, then 4 images per compression
 %cycle. Negative values are to compress the system, positive one to detent.
 motionSeries = -floor(CompressionSteps) * (2*mod(floor(linspace(0,1,2)),2)-1)';
 % -floor(CompressionSteps/8) * (2*mod(floor(linspace(0,15,16)/8),2)-1)';
 numberOfScans = length(motionSeries);
 
-% -------------------------------------------------------------------------
-% -------------------------------------------------------------------------
+
 %Input Save Settings and create directory
-target_folder = 'C:\Users\Lab User\Desktop\experiment data\07312027\';
-mkdir(target_folder);
+info = string({dir('C:\Users\Lab User\Desktop\ModernExperiments').name});
+x = str2double(extractAfter(info(startsWith(info, 'exp_')), 4));
+mkdir(fullfile(target_folder, sprintf('exp_%d', max(x)+1)))
 
 %Prep Laser and Camera Motors
-motorsetup; %creates serial objects s1, s2, s3 
+motorsetup;                     %creates serial objects s1, s2, s3 
 
 %Prep Compression Cell Motor
 
-CompSetup; %uses "CompressionSpeed" and creates serial object s4
+CompSetup;                      %uses "CompressionSpeed" and creates serial object s4
 
 %Prep Camera
 %Number of vertical images, we want the same real distance to pixel ratio
@@ -73,9 +74,9 @@ vid_src.GainRaw = 50;
 %start_camera
 start(vid);
 %Set exposure time in miliseconds (option 2)
-vid_src = getselectedsource(vid);%display videosource with the exposuretime
+vid_src = getselectedsource(vid);               %display videosource with the exposuretime
 vid_src.ExposureAuto = "Off";
-vid_src.ExposureTime = exposure_time*1000; %set the exp time to the time above
+vid_src.ExposureTime = exposure_time*1000;      %set the exp time to the time above
 %Obtain the exact time needed for each frame, includes exposure time and
 %readout time, in seconds.
 time_per_frame =exposure_time; %show_frametime(glvar.out_ptr);

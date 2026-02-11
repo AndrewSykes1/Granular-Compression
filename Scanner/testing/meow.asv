@@ -1,0 +1,13 @@
+target_folder = 'C:\Users\Lab User\Desktop\ModernExperiments';
+
+info = dir(target_folder);
+names = string({info.name});
+x = str2double(extractAfter(names(startsWith(names, 'exp_')), 4));
+
+mkdir(strcat(target_folder,'\exp_',string(max(x+1))))
+
+
+disp('Dog')
+disp(x);
+disp(class(x));
+disp(max(x));
