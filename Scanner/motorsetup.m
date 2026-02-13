@@ -1,13 +1,13 @@
 % Near Laser
-s1=serial('COM3');
+s1=serial('COM5');
 fopen(s1);
 
 % % Camera
-s2=serial('COM4');
+s2=serial('COM2');
 fopen(s2);
 
 % % Far Laser
-s3=serial('COM5');
+s3=serial('COM1');
 fopen(s3);
 
 % establish stepper mode
