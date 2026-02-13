@@ -149,12 +149,10 @@ for scanNumber = 1:numberOfScans
     create_hdf5(cntr, imacount, Height, Width, target_folder);
     save_to_hdf5(image_stack(1:Height,1:Width,:), cntr, target_folder)
 
-
-    %FIX
-    %wait for long enough for the motors to move
+    % Pause to allow motor motion
     timeNeeded = (CompressionDistance*25.4)/CompressionSpeed;
-    timeSinceMotorStart = max(cputime - motionStartTime, 0);
-    pause((50)); %timeNeeded - timeSinceMotorStart
+    buffer     = 10;
+    pause((timeNeeded + buffer));
 
     %Estimate times
     ElapsedTime=toc;

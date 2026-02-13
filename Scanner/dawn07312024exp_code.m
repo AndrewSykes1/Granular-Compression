@@ -1,6 +1,5 @@
 %%% Execute a full scan of the 3D subject %%%
 
-
 %%% Establish constants %%%
 % Image capture region
 LoLimX=0;
@@ -109,19 +108,12 @@ moveto(s1, nearlaser_back_targetlocation);
 moveto(s3, farlaser_back_targetlocation);
 moveto(s2, camera_back_targetlocation);
 
+
 %%% Execute series of scans %%%
 tic
 for cycleNum = 98:NumberOfCycles
 cntr = cycleNum*2 + 1;
 for scanNumber = 1:numberOfScans
-    
-    %Do things intelegently: 
-    %   move motors, 
-    %   triger camera, 
-    %   move motors,
-    %   triger camera, 
-    %   etc...
-    %Save parameters to motor controllers
     
     % Set LaseCam into forward mode
     motorparam(s1, laser_forward_rpm,  laser_forward_accel,  laser_forward_decel,  abort_decel);
@@ -149,42 +141,30 @@ for scanNumber = 1:numberOfScans
     create_hdf5(cntr, imacount, Height, Width, target_folder);
     save_to_hdf5(image_stack(1:Height,1:Width,:), cntr, target_folder)
 
-
-    %FIX
-    %wait for long enough for the motors to move
+    % Pause to allow motor motion
     timeNeeded = (CompressionDistance*25.4)/CompressionSpeed;
-    timeSinceMotorStart = max(cputime - motionStartTime, 0);
-    pause((50)); %timeNeeded - timeSinceMotorStart
+    buffer     = 10;
+    pause((timeNeeded + buffer));
 
     %Estimate times
-    ElapsedTime=toc;
-    OutputTimes(ElapsedTime,scanNumber,numberOfScans);
+    ElapsedTime = toc;
+    OutputTimes(ElapsedTime, scanNumber, numberOfScans);
     cntr = cntr + 1;
 end
 end
 
-%Camera Shutdown
-% stop_camera(glvar.out_ptr);
-% if(libisloaded('GRABFUNC'))
-%     unloadlibrary('GRABFUNC');
-% end
-% if(glvar.camera_open == 1)
-%     glvar.do_close = 1;
-%     glvar.do_libunload = 1;
-%     pco_camera_open_close(glvar);
-% end
-% clear glvar;
-
+%%% Shutdown %%%
+% Video 
 stop(vid)
 delete(vid)
 
-%Motor Shutdown
+% Motor
 motorclose;
 CompClose;
 
-%Clear and close everything
+% Variables
 clear all;
 close all;
 
-%Inform of completion
+% Inform of completion
 msg = msgbox('Thy will hast been done as thou hast commanded.','Scan Complete');
