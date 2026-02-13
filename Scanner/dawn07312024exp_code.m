@@ -1,5 +1,24 @@
 %%% Execute a full scan of the 3D subject %%%
 
+%%% Reset %%%
+% Video
+if exist('vid', 'var') == 1
+    stop(vid);
+    delete(vid);
+end
+
+% Motor
+if exist('s1','var') == 1
+    motorclose;
+    CompClose;
+end
+
+% Variables
+close all;
+clear all;
+
+
+
 %%% Establish constants %%%
 % Image capture region
 LoLimX=0;
@@ -32,9 +51,11 @@ numberOfScans = length(motionSeries);
 
 
 %%% Input Save Settings and create directory %%%
-info = string({dir('C:\Users\Lab User\Desktop\ModernExperiments').name});
+directory_folder = 'C:\Users\Lab User\Desktop\ModernExperiments\';
+info = string({dir(directory_folder).name});
 x = str2double(extractAfter(info(startsWith(info, 'exp_')), 4));
-mkdir(fullfile(target_folder, sprintf('exp_%d', max(x)+1)))
+target_folder = fullfile(directory_folder, sprintf('exp_%d', max(x)+1), '\');
+mkdir(target_folder)
 
 
 %%% Prep All %%%
@@ -112,7 +133,7 @@ moveto(s2, camera_back_targetlocation);
 %%% Execute series of scans %%%
 tic
 for cycleNum = 98:NumberOfCycles
-cntr = cycleNum*2 + 1;
+cntr = 1;
 for scanNumber = 1:numberOfScans
     
     % Set LaseCam into forward mode
@@ -153,7 +174,7 @@ for scanNumber = 1:numberOfScans
 end
 end
 
-%%% Shutdown %%%
+%%% Reset %%%
 % Video 
 stop(vid)
 delete(vid)

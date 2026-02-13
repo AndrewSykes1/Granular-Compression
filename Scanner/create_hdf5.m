@@ -11,6 +11,4 @@ ChunkSize = [XResolution YResolution 1];
 
 h5create(file,datasetname,size,'Datatype','uint16','ChunkSize',ChunkSize, ...
         'Shuffle',true,'Deflate',4,'Fletcher32',true);
-
-
 end

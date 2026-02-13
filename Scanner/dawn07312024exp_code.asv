@@ -1,5 +1,18 @@
 %%% Execute a full scan of the 3D subject %%%
 
+%%% Reset %%%
+% Video 
+stop(vid)
+delete(vid)
+
+% Motor
+motorclose;
+CompClose;
+
+% Variables
+clear all;
+close all;
+
 
 %%% Establish constants %%%
 % Image capture region
@@ -33,8 +46,10 @@ numberOfScans = length(motionSeries);
 
 
 %%% Input Save Settings and create directory %%%
-info = string({dir('C:\Users\Lab User\Desktop\ModernExperiments').name});
+target_folder = 'C:\Users\Lab User\Desktop\ModernExperiments\';
+info = string({dir(target_folder).name});
 x = str2double(extractAfter(info(startsWith(info, 'exp_')), 4));
+target_folder
 mkdir(fullfile(target_folder, sprintf('exp_%d', max(x)+1)))
 
 
@@ -109,19 +124,12 @@ moveto(s1, nearlaser_back_targetlocation);
 moveto(s3, farlaser_back_targetlocation);
 moveto(s2, camera_back_targetlocation);
 
+
 %%% Execute series of scans %%%
 tic
 for cycleNum = 98:NumberOfCycles
 cntr = cycleNum*2 + 1;
 for scanNumber = 1:numberOfScans
-    
-    %Do things intelegently: 
-    %   move motors, 
-    %   triger camera, 
-    %   move motors,
-    %   triger camera, 
-    %   etc...
-    %Save parameters to motor controllers
     
     % Set LaseCam into forward mode
     motorparam(s1, laser_forward_rpm,  laser_forward_accel,  laser_forward_decel,  abort_decel);
@@ -155,34 +163,24 @@ for scanNumber = 1:numberOfScans
     pause((timeNeeded + buffer));
 
     %Estimate times
-    ElapsedTime=toc;
-    OutputTimes(ElapsedTime,scanNumber,numberOfScans);
+    ElapsedTime = toc;
+    OutputTimes(ElapsedTime, scanNumber, numberOfScans);
     cntr = cntr + 1;
 end
 end
 
-%Camera Shutdown
-% stop_camera(glvar.out_ptr);
-% if(libisloaded('GRABFUNC'))
-%     unloadlibrary('GRABFUNC');
-% end
-% if(glvar.camera_open == 1)
-%     glvar.do_close = 1;
-%     glvar.do_libunload = 1;
-%     pco_camera_open_close(glvar);
-% end
-% clear glvar;
-
+%%% Reset %%%
+% Video 
 stop(vid)
 delete(vid)
 
-%Motor Shutdown
+% Motor
 motorclose;
 CompClose;
 
-%Clear and close everything
+% Variables
 clear all;
 close all;
 
-%Inform of completion
+% Inform of completion
 msg = msgbox('Thy will hast been done as thou hast commanded.','Scan Complete');
