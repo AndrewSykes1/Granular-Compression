@@ -1,25 +1,7 @@
 %%% Execute a full scan of the 3D subject %%%
 
-%%% Reset %%%
-% Video
-if exist('vid', 'var') == 1
-    stop(vid);
-    delete(vid);
-end
-
-% Motor
-if exist('s1','var') == 1
-    motorclose;
-    CompClose;
-end
-
-% Variables
-close all;
-clear all;
-
-
-
 %%% Establish constants %%%
+
 % Image capture region
 LoLimX=0;
 LoLimY=0;
@@ -48,7 +30,7 @@ abort_decel = 50;                                              % Emergency stop 
 motionSeries = -floor(CompressionSteps)  *(2*mod(floor(linspace(0, 1, 2)  ),2)-1)'; % Make 4 images per cycle 
 %              -floor(CompressionSteps/8)*(2*mod(floor(linspace(0,15,16)/8),2)-1)'; % Make 16 images per cycle
 numberOfScans = length(motionSeries);
-
+disp('Constants established')
 
 %%% Input Save Settings and create directory %%%
 directory_folder = 'C:\Users\Lab User\Desktop\ModernExperiments\';
@@ -56,9 +38,12 @@ info = string({dir(directory_folder).name});
 x = str2double(extractAfter(info(startsWith(info, 'exp_')), 4));
 target_folder = fullfile(directory_folder, sprintf('exp_%d', max(x)+1), '\');
 mkdir(target_folder)
-
+disp('Created Directory')
 
 %%% Prep All %%%
+
+
+
 % Prep Motors
 motorsetup;     % Create serial objects s1, s2, s3 
 CompSetup;      % Use "CompressionSpeed" and create s4
@@ -92,7 +77,7 @@ vid_src = getselectedsource(vid);
 vid_src.ExposureAuto = "Off";
 vid_src.ExposureTime = exposure_time*1000;  % Set exposure time in microseconds
 time_per_frame = exposure_time;             % Find time to obtain each frame
-
+disp('Camera configured')
 
 %%% Motor Config %%%
 % Forward Laser
@@ -128,6 +113,7 @@ motorparam(s2, camera_back_rpm, camera_back_accel, camera_back_decel, abort_dece
 moveto(s1, nearlaser_back_targetlocation);
 moveto(s3, farlaser_back_targetlocation);
 moveto(s2, camera_back_targetlocation);
+disp('Motors Homed')
 
 
 %%% Execute series of scans %%%
