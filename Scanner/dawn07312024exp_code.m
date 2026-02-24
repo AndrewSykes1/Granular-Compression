@@ -1,7 +1,11 @@
+% Delete all serial and camera objects in memory
+delete(instrfindall);
+clear s1 s2 s3 s4;
+imaqreset;
+
 %%% Execute a full scan of the 3D subject %%%
 
 %%% Establish constants %%%
-
 % Image capture region
 LoLimX=0;
 LoLimY=0;
@@ -32,6 +36,8 @@ motionSeries = -floor(CompressionSteps)  *(2*mod(floor(linspace(0, 1, 2)  ),2)-1
 numberOfScans = length(motionSeries);
 disp('Constants established')
 
+
+
 %%% Input Save Settings and create directory %%%
 directory_folder = 'C:\Users\Lab User\Desktop\ModernExperiments\';
 info = string({dir(directory_folder).name});
@@ -40,10 +46,9 @@ target_folder = fullfile(directory_folder, sprintf('exp_%d', max(x)+1), '\');
 mkdir(target_folder)
 disp('Created Directory')
 
+
+
 %%% Prep All %%%
-
-
-
 % Prep Motors
 motorsetup;     % Create serial objects s1, s2, s3 
 CompSetup;      % Use "CompressionSpeed" and create s4
@@ -78,6 +83,8 @@ vid_src.ExposureAuto = "Off";
 vid_src.ExposureTime = exposure_time*1000;  % Set exposure time in microseconds
 time_per_frame = exposure_time;             % Find time to obtain each frame
 disp('Camera configured')
+
+
 
 %%% Motor Config %%%
 % Forward Laser
@@ -114,6 +121,8 @@ moveto(s1, nearlaser_back_targetlocation);
 moveto(s3, farlaser_back_targetlocation);
 moveto(s2, camera_back_targetlocation);
 disp('Motors Homed')
+
+
 
 
 %%% Execute series of scans %%%
