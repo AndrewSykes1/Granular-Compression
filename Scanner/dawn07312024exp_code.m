@@ -123,7 +123,7 @@ moveto(s2, camera_back_targetlocation);
 disp('Motors Homed')
 
 
-
+pause(10);
 
 %%% Execute series of scans %%%
 tic
