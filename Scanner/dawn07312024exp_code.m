@@ -122,6 +122,7 @@ moveto(s3, farlaser_back_targetlocation);
 moveto(s2, camera_back_targetlocation);
 disp('Motors Homed')
 
+% insert a compression motor homing here using SH1L
 
 pause(10);
 
