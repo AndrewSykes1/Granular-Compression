@@ -120,11 +120,12 @@ motorparam(s2, camera_back_rpm, camera_back_accel, camera_back_decel, abort_dece
 moveto(s1, nearlaser_back_targetlocation);
 moveto(s3, farlaser_back_targetlocation);
 moveto(s2, camera_back_targetlocation);
+compHome(s4);
 disp('Motors Homed')
 
 % insert a compression motor homing here using SH1L
 
-pause(10);
+pause(60);
 
 %%% Execute series of scans %%%
 tic
