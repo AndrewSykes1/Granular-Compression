@@ -1,0 +1,9 @@
+function estimateFinish(dtObj,elapsed,numberOfScans)
+
+estimatedHours = elapsed * 2*numberOfScans/60/60;
+newDt = dtObj + hours(estimatedHOurs);
+disp("=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+fprintf('Estimated finish in %s hours at %s\n', string(round(estimatedTime,2)), string(estDt));
+disp("=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+
+end
