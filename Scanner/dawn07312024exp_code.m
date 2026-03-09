@@ -181,25 +181,11 @@ for cycleNum = minNumberOfCycles:numberOfCycles
         buffer     = 10;
         pause((timeNeeded + buffer));
 
-        ElapsedTime = toc;
         if scanNumber == minNumberOfScans & cycleNum == minNumberOfCycles
-            estimatedTime = toc*(2*numberOfCycles)/60/60;
-            estDt = dt + hours(estimatedTime);
-            disp("=-=-=-=-=-=-=-=-=-=-=-=-=-=");
-            fprintf('Estimated finish in %s hours at %s\n', string(round(estimatedTime,2)), string(estDt));
-            disp("=-=-=-=-=-=-=-=-=-=-=-=-=-=");
-
-            %disp(scanNumber);
-            %disp(cycleNum);
-
-            %disp(toc);
-            %disp(toc*(2*numberOfCycles)/60/60)
-            %OutputTimes(ElapsedTime, scanNumber, numberOfScans);;
+          elapsedTime = toc;
+          estimateFinish(dt,elapsedTime, numberOfScans);
         end
-
-        %Estimate times
-        %ElapsedTime = toc;
-        %OutputTimes(ElapsedTime, scanNumber, numberOfScans);
+        
         cntr = cntr + 1;
     end
 end
