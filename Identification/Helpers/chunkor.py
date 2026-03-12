@@ -13,6 +13,7 @@ def chunkor(data,kernel):
     :param kernel: An oddxoddxodd np array
     """
 
+    # region Space Details
     # Make sure data is evenly divisable
     assert all(coord % 2 == 0 for coord in data.shape), 'Data dimensions must all be even.' 
 
@@ -37,21 +38,33 @@ def chunkor(data,kernel):
     print(f'Data Ram: {np.round(data.nbytes/(1024**3),2)} GB')
     print(f'Attempting {2**cuts} partitions')
     display(df)
+    #endregion
 
     # Define cuts and pads
     r,c,z = data.shape
-    dPad = int(kernel.shape[0]/2)
+    kP = int(kernel.shape[0]/2) # Announce padding needed to prevent circular conv
 
-    upper = data[:,:,int(z/2)-dPad:z] # U:
-    lower = data[:,:,0:int(z/2)+dPad] # L:
+    upper = data[:,:,   int(z/2)-kP: ] # U
+    lower = data[:,:, 0:int(z/2)+kP  ] # L
     
     # Save cut segments to list
     if cuts==1:
-        chunks = [upper,lower] # U:, L:
+        upperP = np.pad(upper, pad_width=((kP,kP),(kP,kP),(0,kP)))
+        lowerP = np.pad(lower, pad_width=((kP,kP),(kP,kP),(kP,0)))
+        chunksP = [upperP,lowerP]
+
     elif cuts == 2:
-        chunks = [upper[:,int(c/2)-dPad:c,:], upper[:,0:int(c/2)+dPad,:], #UU, UL
-                  lower[:,int(c/2)-dPad:c,:], lower[:,0:int(c/2)+dPad,:]] #LU, LL
+        uu,ul = upper[:, :int(c/2)+kP ,:], upper[:, int(c/2)-kP: ,:]
+        lu,ll = lower[:, :int(c/2)+kP ,:], lower[:, int(c/2)-kP: ,:]
+        
+        uuP = np.pad(uu,pad_width=((),(),()))
+
+
+        chunks = [upper[:, int(c/2)+kP ,:], upper[:, 0:int(c/2)-kP ,:], #UU, UL
+                  lower[:, int(c/2)+kP ,:], lower[:, 0:int(c/2)-kP ,:]] #LU, LL
     
+
+
     # Apply global padding to chunks
     print(chunks[0].shape)
     pchunks = [F.pad(torch.from_numpy(chunk), pad=(pads,)*6) for chunk in chunks]

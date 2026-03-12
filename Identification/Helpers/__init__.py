@@ -6,4 +6,12 @@ from .sharpen import sharpen
 from .multiplot import multiplot
 from .sphereMask import sphereMask
 from .dataSizes import dataSizes
-from .chunkor import chunkor
+from .chunker import chunker
+from .unchunker import unchunker
+from .kernelPad import kernelPad
+from .visualizer import visualizer
+
+from .particleGrid import particleGrid
+from .idealParticleGrid import idealParticleGrid
+from .dwOptimizer import dwOptimizer
+from .posOptimizer import posOptimizer

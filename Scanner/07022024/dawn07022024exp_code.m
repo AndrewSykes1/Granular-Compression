@@ -100,12 +100,12 @@ camera_back_decel = 10;
 image_stack=zeros(2048,2448,imacount,'uint16'); 
 
 %Home lasers and camera
-%motorparam(s1,laser_back_rpm,laser_back_accel,laser_back_decel,abort_decel);
-%motorparam(s3,laser_back_rpm,laser_back_accel,laser_back_decel,abort_decel);
-%motorparam(s2,camera_back_rpm,camera_back_accel,camera_back_decel,abort_decel);
-%moveto(s1,laser_back_targetlocation);
-%moveto(s3,laser_back_targetlocation);
-%moveto(s2,camera_back_targetlocation);
+motorparam(s1,laser_back_rpm,laser_back_accel,laser_back_decel,abort_decel);
+motorparam(s3,laser_back_rpm,laser_back_accel,laser_back_decel,abort_decel);
+motorparam(s2,camera_back_rpm,camera_back_accel,camera_back_decel,abort_decel);
+moveto(s1,laser_back_targetlocation);
+moveto(s3,laser_back_targetlocation);
+moveto(s2,camera_back_targetlocation);
 
 %execute series of scans
 tic

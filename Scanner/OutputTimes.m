@@ -4,7 +4,7 @@ function OutputTimes(ElapsedTime,scanNumber,numberOfScans)
 
 disp(['Elapsed time is: ',secs2hms(ElapsedTime)]);
 
-EstimatedTime=ElapsedTime/scanNumber*numberOfScans-ElapsedTime;
+EstimatedTime= ElapsedTime/scanNumber * numberOfScans - ElapsedTime;
 
 disp(['Estimated time to finish is: ',secs2hms(EstimatedTime)]);
 
