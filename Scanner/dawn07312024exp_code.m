@@ -9,7 +9,7 @@ imaqreset;
 
 %%% Execute a full scan of the 3D subject %%%
 
-%%% Establish constants %%%
+%% Establish constants %%
 % Image capture region
 LoLimX=0;
 LoLimY=0;
@@ -23,11 +23,11 @@ pixel_width      = volume_length*25.4/Width;          % Pixel to distance conver
 imacount         = floor(scan_distance/pixel_width);  % Number of images in stack
 
 refraction_index = 1.49;                              %used to calculate relative speed of camera and laser motors (No clue if this is reasonable)
-exposure_time    = 50;                                % Exposure time (ms)
+exposure_time    = 20;                                % Exposure time (ms)
 numberOfCycles   = 100;                               % Number of compressions per cycle, first and last ten are high res ones.
 
 %Input Parameters for compression cell motion
-CompressionSpeed    = 0.05;                                    % Speed of compression (mm/s)
+CompressionSpeed    = 0.2;                                    % Speed of compression (mm/s)
 CompressionPercent  = 1;                                       % Percent of 'current' container size to compress
 CompressionDistance = volume_length*CompressionPercent/100.0;  % Distance to compress (mm)
 CompressionSteps    = floor(CompressionDistance*10*51200);     % Motor steps to compress said distance (steps)
@@ -38,27 +38,34 @@ abort_decel = 50;                                              % Emergency stop 
 motionSeries = -floor(CompressionSteps)  *(2*mod(floor(linspace(0, 1, 2)  ),2)-1)'; % Make 4 images per cycle 
 %              -floor(CompressionSteps/8)*(2*mod(floor(linspace(0,15,16)/8),2)-1)'; % Make 16 images per cycle
 numberOfScans = length(motionSeries);
-disp('Constants established.')
+disp('Constants established')
 
 
 
-%%% Input Save Settings and create directory %%%
+%% Input Save Settings and create directory %%
 directory_folder = 'C:\Users\Lab User\Desktop\ModernExperiments\';
 info = string({dir(directory_folder).name});
 x = str2double(extractAfter(info(startsWith(info, 'exp_')), 4));
 target_folder = fullfile(directory_folder, sprintf('exp_%d', max(x)+1), '\');
 mkdir(target_folder)
-disp('Created directory.')
+fprintf('Created directory exp_%d\n',max(x)+1)
 
 
 
-%%% Prep All %%%
-% Prep Motors
-motorsetup;     % Create serial objects s1, s2, s3 
-CompSetup;      % Use "CompressionSpeed" and create s4
-disp('Connected to motors.')
+%% Prep Motors %%
+nearLaserCom = 'COM5'; cameraCom = 'COM2';
+farLaserCom  = 'COM1'; compCom   = 'COM4';
 
-% Config Camera
+motorsetup; % Create serial objects s1, s2, s3 
+CompSetup;  % Create serial objects s4
+
+disp('Connected to motors on:')
+    fprintf('- Near: %s\n',nearLaserCom);
+    fprintf('- Far:  %s\n',farLaserCom);
+    fprintf('- Cam:  %s\n',cameraCom);
+    fprintf('- Comp: %s\n',compCom);
+
+%% Config Camera %%
 vid = videoinput('gentl',1,'Mono12Packed');     % Standard glvar setup
 vid.ROIPosition = [LoLimX LoLimY Width Height]; % Crop camera
 
@@ -87,11 +94,9 @@ vid_src = getselectedsource(vid);
 vid_src.ExposureAuto = "Off";
 vid_src.ExposureTime = exposure_time*1000;  % Set exposure time in microseconds
 time_per_frame = exposure_time;             % Find time to obtain each frame
-disp('Camera configured.')
+disp('Camera configured')
 
-
-
-%%% Motor Config %%%
+%% Motor Config %%
 % Forward Laser
 laser_forward_targetlocations = linspace(1,imacount,imacount)*floor(scan_distance/(85*imacount)*50000);  % Laser goal locations [50,000microsteps]=[1rev] [1rev]=[85mm]
 laser_forward_rpm   = 200;  % Forward vel (rpm)
@@ -118,79 +123,49 @@ camera_back_accel = 10;           % Reverse acc (rps^2)
 camera_back_decel = 10;           % Reverse dcc (rps^2)
 camera_back_targetlocation = 0;   % Lower position bound for camera
 
-% Home LaseCam
-motorparam(s1, laser_back_rpm,  laser_back_accel,  laser_back_decel,  abort_decel);
-motorparam(s3, laser_back_rpm,  laser_back_accel,  laser_back_decel,  abort_decel);
-motorparam(s2, camera_back_rpm, camera_back_accel, camera_back_decel, abort_decel);
-moveto(s1, nearlaser_back_targetlocation);
-moveto(s3, farlaser_back_targetlocation);
-moveto(s2, camera_back_targetlocation);
+% Home & wait
+homeLaseCam;
 pause(10);
+fprintf('LaseCam motors homed\n')
 
-fprintf('LaseCam motors homed.\n')
 % Must home compression cell manually as amplifier contains no flash memory
 
+disp(preview(vid));
 
-
-
-
-%%% Execute series of scans %%%
+%% Execute series of scans %%
 minNumberOfCycles = 98;
 minNumberOfScans = 1;
 cntr = 1;
 
 tic;
 dt = datetime('now','TimeZone','local','Format','HH:mm:ss');
-disp('=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+');
+disp('+=========================+');
 fprintf('Beginning scan at %s\n', dt);
-disp('=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+');
+disp('+=========================+');
 for cycleNum = minNumberOfCycles:numberOfCycles
     for scanNumber = minNumberOfScans:numberOfScans
     
-        %%% Take scan and rehome %%%
-        % Set LaseCam into forward mode
-        motorparam(s1, laser_forward_rpm,  laser_forward_accel,  laser_forward_decel,  abort_decel);
-        motorparam(s3, laser_forward_rpm,  laser_forward_accel,  laser_forward_decel,  abort_decel);
-        motorparam(s2, camera_forward_rpm, camera_forward_accel, camera_forward_decel, abort_decel);
-
-        % Begin laser scanning
-        make_scan;
-   
-        % Home LaseCam
-        motorparam(s1, laser_back_rpm,  laser_back_accel,  laser_back_decel,  abort_decel);
-        motorparam(s3, laser_back_rpm,  laser_back_accel,  laser_back_decel,  abort_decel);
-        motorparam(s2, camera_back_rpm, camera_back_accel, camera_back_decel, abort_decel);
-        moveto(s1, nearlaser_back_targetlocation);
-        moveto(s3, farlaser_back_targetlocation);
-        moveto(s2, camera_back_targetlocation);
+        %% Take scan and rehome %%        
+        forwardLaseCam; % Set lasecam to forward mode
+        make_scan;      % Create scan & make vid buffer
+        homeLaseCam;    % Home
     
-
-
         % Compress cell
         moveWall(motionSeries(scanNumber),s4);
         motionStartTime = cputime;             % Note time of comp motor initialization
         disp(['Wall Counter: ', num2str(scanNumber)]);
         disp(['Moving wall: ' , num2str(motionSeries(scanNumber))]);
 
-        % Save current scan
-        create_hdf5(cntr, imacount, Height, Width, target_folder);
-        save_to_hdf5(image_stack(1:Height,1:Width,:), cntr, target_folder)
 
-        % Pause to allow motor motion
-        timeNeeded = (CompressionDistance*25.4)/CompressionSpeed;
-        buffer     = 10;
-        pause((timeNeeded + buffer));
-
-        if scanNumber == minNumberOfScans & cycleNum == minNumberOfCycles
-          elapsedTime = toc;
-          estimateFinish(dt,elapsedTime, numberOfScans);
-        end
-        
+        %% Routine duties
+        saveScan;   % Save scan to HDF5
+        pauseMotor; % Pause to for motors to return
+        estFinish;  % Estimate time till finish
         cntr = cntr + 1;
     end
 end
 
-%%% Reset %%%
+%% Reset %%
 % Video 
 stop(vid)
 delete(vid)
