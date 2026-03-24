@@ -8,7 +8,7 @@ for imageNumber = 1:imacount
         image_stack(:,:,imageNumber) = data(:,:,:,1);
 
         if imageNumber == round(imacount/2,1)
-            imshow(data(:,:,:,1));
+            image(data(:,:,:,1));
         end
         
         %Move lasers and camera

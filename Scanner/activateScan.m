@@ -7,6 +7,9 @@ delete(instrfindall);
 clear s1 s2 s3 s4;
 imaqreset;
 
+
+
+
 %%% Execute a full scan of the 3D subject %%%
 
 %% Establish constants %%
@@ -36,20 +39,18 @@ abort_decel = 50;                                              % Emergency stop 
 
 % Instruction list of number of 'steps' in order to compress then decompress (- to compress, + to decompress)                                                             
 motionSeries = -floor(CompressionSteps)  *(2*mod(floor(linspace(0, 1, 2)  ),2)-1)'; % Make 4 images per cycle 
-%              -floor(CompressionSteps/8)*(2*mod(floor(linspace(0,15,16)/8),2)-1)'; % Make 16 images per cycle
+dog =              -floor(CompressionSteps/8)*(2*mod(floor(linspace(0,15,16)/8),2)-1)'; % Make 16 images per cycle
 numberOfScans = length(motionSeries);
-disp('Constants established')
+disp('Constants established');
 
+fprintf('dog %.f\n',dog)
 
+pics = 10;
+mS = linspace(0,CompressionSteps,10);
+fprintf("mS: %.f\n",mS)
 
-%% Input Save Settings and create directory %%
-directory_folder = 'C:\Users\Lab User\Desktop\ModernExperiments\';
-info = string({dir(directory_folder).name});
-x = str2double(extractAfter(info(startsWith(info, 'exp_')), 4));
-target_folder = fullfile(directory_folder, sprintf('exp_%d', max(x)+1), '\');
-mkdir(target_folder)
-fprintf('Created directory exp_%d\n',max(x)+1)
-
+fprintf("Comp mag: %d\n",-floor(CompressionSteps));
+fprintf("Steps: %d\n",motionSeries);
 
 
 %% Prep Motors %%
@@ -125,44 +126,42 @@ camera_back_targetlocation = 0;   % Lower position bound for camera
 
 % Home & wait
 homeLaseCam;
-pause(10);
+pause(5);
 fprintf('LaseCam motors homed\n')
+
+
 
 % Must home compression cell manually as amplifier contains no flash memory
 
-disp(preview(vid));
+%disp(preview(vid));
+fprintf('Stuff: %.f\n',laser_forward_targetlocations);
+fprintf("lenght: %d\n", size(laser_forward_targetlocations));
+stop;
+
+% Scan params
+minNumberOfScans = 1; cntr = 1; tic;
+startScanMsg;  % Current time
+makeDirectory; % Create directory
 
 %% Execute series of scans %%
-minNumberOfCycles = 98;
-minNumberOfScans = 1;
-cntr = 1;
-
-tic;
-dt = datetime('now','TimeZone','local','Format','HH:mm:ss');
-disp('+=========================+');
-fprintf('Beginning scan at %s\n', dt);
-disp('+=========================+');
-for cycleNum = minNumberOfCycles:numberOfCycles
-    for scanNumber = minNumberOfScans:numberOfScans
+for scanNumber = minNumberOfScans:numberOfScans
     
-        %% Take scan and rehome %%        
-        forwardLaseCam; % Set lasecam to forward mode
-        make_scan;      % Create scan & make vid buffer
-        homeLaseCam;    % Home
+    %% Take scan and rehome %%        
+    forwardLaseCam; % Set lasecam to forward mode
+    make_scan;      % Create scan & make vid buffer
+    homeLaseCam;    % Home
     
-        % Compress cell
-        moveWall(motionSeries(scanNumber),s4);
-        motionStartTime = cputime;             % Note time of comp motor initialization
-        disp(['Wall Counter: ', num2str(scanNumber)]);
-        disp(['Moving wall: ' , num2str(motionSeries(scanNumber))]);
+    % Compress cell
+    moveWall(motionSeries(scanNumber),s4);
+    disp(['Wall Counter: ', num2str(scanNumber)]);
+    disp(['Moving wall: ' , num2str(motionSeries(scanNumber))]);
 
+    %% Routine duties
+    saveScan;   % Save scan to HDF5
+    pauseMotor; % Pause to for motors to return
+    estFinish;  % Estimate time till finish
 
-        %% Routine duties
-        saveScan;   % Save scan to HDF5
-        pauseMotor; % Pause to for motors to return
-        estFinish;  % Estimate time till finish
-        cntr = cntr + 1;
-    end
+    cntr = cntr + 1;
 end
 
 %% Reset %%
