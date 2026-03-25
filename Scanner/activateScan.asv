@@ -34,20 +34,20 @@ CompressionSteps    = floor(CompressionDistance*10*51200);     % Motor steps to 
 abort_decel = 50;                                              % Emergency stop deceleration (rps^2)
 
 % Instruction list of number of 'steps' in order to compress then decompress (- to compress, + to decompress)     
-numComp= 4; motionSeries = [];
-for i=1:2*numComp
-    if mod(i,2) == 0, motionSeries = [motionSeries -3400];
-        else, motionSeries = [motionSeries 3400];
+numSteps = 2; motionSeries = [];
+for i=1:numSteps
+    if mod(i,2) == 0, A = [motionSeries*-3400];
+    else A = [motionSeries*3400];
     end
 end
-%motionSeries = -floor(CompressionSteps) * (2*mod(floor(linspace(0, 1, 2)),2)-1); % Make 4 images per cycle 
+motionSeries = -floor(CompressionSteps) * (2*mod(floor(linspace(0, 1, 2)),2)-1); % Make 4 images per cycle 
 %dog =              -floor(CompressionSteps/8)*(2*mod(floor(linspace(0,15,16)/8),2)-1)'; % Make 16 images per cycle
 numberOfScans = length(motionSeries);
 disp('Constants established');
 
 %motionSeries = [3400 -3400];
 
-%fprintf("Series: %.f\n",motionSeries);
+fprintf("Series: %.f\n",motionSeries);
 
 
 %% Prep Motors %%
@@ -130,7 +130,7 @@ fprintf('LaseCam motors homed\n')
 
 % Must home compression cell manually as amplifier contains no flash memory
 
-disp(preview(vid));
+%disp(preview(vid));
 fprintf('Stuff: %.f\n',laser_forward_targetlocations);
 fprintf("lenght: %d\n", size(laser_forward_targetlocations));
 

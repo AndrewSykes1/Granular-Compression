@@ -1,4 +1,4 @@
-if scanNumber == minNumberOfScans & cycleNum == minNumberOfCycles
+if scanNumber == minNumberOfScans
 
     elapsedTime = toc;
     estimatedHours = elapsedTime * 2*numberOfScans/60/60;
