@@ -22,7 +22,7 @@ pixel_width      = volume_length*25.4/Width;          % Pixel to distance conver
 imacount         = floor(scan_distance/pixel_width);  % Number of images in stack
 
 refraction_index = 1.49;                              %used to calculate relative speed of camera and laser motors (No clue if this is reasonable)
-exposure_time    = 20;                                % Exposure time (ms)
+exposure_time    = 50;                                % Exposure time (ms)
 numberOfCycles   = 100;                               % Number of compressions per cycle, first and last ten are high res ones.
 
 %Input Parameters for compression cell motion
@@ -69,20 +69,19 @@ vid.ROIPosition = [LoLimX LoLimY Width Height]; % Crop camera
 
 % Trigger settings
 vid.TriggerRepeat = Inf;           % Enable continous scanning
-vid.FrameGrabInterval = 5;         % Store only every 5th frame
+vid.FrameGrabInterval = 1;         % Store only every 5th frame
 
 % Obtain source
 vid_src = getselectedsource(vid);
 vid_src.Tag = 'particle image';
 
-% Pooling by addition
+% Binning by addition
 vid_src.BinningHorizontal = 2;    % Horizontal pixel addition
 vid_src.BinningVertical = 2;      % Verticle pixel addition
 
 % Set gain
 vid_src.GainAuto = 'Off';
-vid_src.Gain = 5;
-vid_src.GainRaw = 50;
+vid_src.Gain = 0;
 
 % Start camera
 start(vid);
@@ -125,10 +124,6 @@ camera_back_targetlocation = 0;   % Lower position bound for camera
 homeLaseCam;
 pause(5);
 fprintf('LaseCam motors homed\n')
-
-
-
-% Must home compression cell manually as amplifier contains no flash memory
 
 disp(preview(vid));
 fprintf('Stuff: %.f\n',laser_forward_targetlocations);
