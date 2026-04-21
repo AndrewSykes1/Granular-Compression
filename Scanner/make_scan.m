@@ -1,20 +1,16 @@
 % Take data for each cross section
 fprintf("Currently in Scan %d\n",scanNumber);
 fprintf("Current stack dims: (%d,%d,%d)\n", size(image_stack));
-for imageNumber = 1:imacount
+for imageNumber = 1:imageCount
         
         %Take one frame
-        data = getdata(vid,1);
-        image_stack(:,:,imageNumber) = data(:,:,:,1);
-
-        if imageNumber == round(imacount/2,1)
-            imshow(data(:,:,:,1));
-        end
+        frame = getdata(vid,1);
+        image_stack(:,:,imageNumber) = frame(:,:,:,1);
         
         %Move lasers and camera
-        moveto(s1,-laser_forward_targetlocations(imageNumber))
-        moveto(s3,laser_forward_targetlocations(imageNumber))
-        moveto(s2,camera_forward_targetlocations(imageNumber)) 
+        moveto(s1,motorTargets(imageNumber))
+        moveto(s3,motorTargets(imageNumber))
+        moveto(s2,motorTargets(imageNumber)) 
 end
 
 

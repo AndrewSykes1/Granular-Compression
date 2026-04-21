@@ -1,16 +1,13 @@
 %Open serial port
-%s4=serial('COM4','BaudRate',9600,'Terminator','CR','DataBits',8, ...
-          %'Parity','none','StopBits',1);
-s4=serialport(compCom,9600,'DataBits',8, ...
-          'Parity','none','StopBits',1);
+s4=serialport(compCom,9600,'DataBits',8, 'Parity','none','StopBits',1);
 configureTerminator(s4,"CR")
 
 writeline(s4,'HR'); %start communication
 writeline(s4,'AR'); %Reset alarm just in case
 writeline(s4,'ME'); %Enable motor
 
-%Compute the velocity in terms of rev per sec
-RevVelocity = CompressionSpeed*10.0/(25.4); %The wall now moves 0.1" per revolution.
+%Compute the velocity in rev per sec
+RevVelocity = compVelocity*10.0/(25.4); %The wall now moves 0.1" per revolution.
 Velocity_command = strcat('VE',num2str(RevVelocity));
 RevACDE = RevVelocity*10;
 Acceleration_command = strcat('AC',num2str(RevACDE));
