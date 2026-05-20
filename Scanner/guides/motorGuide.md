@@ -48,5 +48,7 @@ The format for the ST5-S is signficantly more simple than the STP. Simply pass i
 
 ### Examples
 Set acceleration rate to 100: AC100<br>
-Begin communication: HR
+Begin communication: HR<br>
+Move to position 500,000: FL500000<br>
+Stop: ST <br>
 

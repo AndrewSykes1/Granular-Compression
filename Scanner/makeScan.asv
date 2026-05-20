@@ -1,0 +1,22 @@
+% Take data for each cross section
+fprintf("Currently in Scan %d\n",scanNumber);
+fprintf("Current stack dims: (%d,%d,%d)\n", size(imgStack));
+for imgNumber = 1:imgCount
+        
+        %Take one frame
+        frame = getdata(vid,1);
+        imgStack(:,:,imgNumber) = frame(:,:,:,1);
+        
+        %Move lasers and camera
+        moveto(s1,motorTargets(imgNumber))
+        moveto(s3,motorTargets(imgNumber))
+        moveto(s2,motorTargets(imgNumber)) 
+end
+
+
+
+
+
+
+
+

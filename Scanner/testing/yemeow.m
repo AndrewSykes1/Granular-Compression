@@ -1,6 +1,6 @@
 %%% MOTOR TEST SCRIPT %%%
+delete(instrfindall);
 clear all;
-close all;
 clc;
 serialportlist("available")
 

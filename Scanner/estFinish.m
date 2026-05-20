@@ -1,7 +1,7 @@
-if scanNumber == minNumberOfScans
+if scanNumber == 1
 
     elapsedTime = toc;
-    estimatedHours = elapsedTime * 2*numberOfScans/60/60;
+    estimatedHours = elapsedTime * 2*totalScans/60/60;
     newDt = dt + hours(estimatedHours);
 
     disp("+-----------------------------------------+");

@@ -4,81 +4,67 @@ warning('off', 'instrument:instrfindall:FunctionToBeRemoved');
 
 % Delete all serial and camera objects in memory
 delete(instrfindall);
-clear s1 s2 s3 s4;
+clear all;
 imaqreset;
 
-%%% Execute a full scan of the 3D subject %%%
 %% Establish constants %%
 
+% General
+volumeLen = 15.3/2.54;   % Length(in) of volume compressed
+containerHeight = 50000; % Units of (u)
+abortDcc = 50;           % Emergency stop deceleration (rps^2)
+
 % Camera
-LoLimX=0; Width = 1224;  % ROI
-LoLimY=0; Height = 1024;  
-exposure_time    = 50;   % Exposure time (ms)
-imageCount      = 500;    % Number of images in stack
+LoLimX=0; Width  = 1224;
+LoLimY=0; Height = 1024;
+exposureTime = 50;   % Exposure time (ms)
+imgCount     = 500;  % Number of images in stack
+imgStack = zeros(Height, Width, imgCount, 'uint16');
 
-image_stack      = zeros(Height, Width, imageCount, 'uint16');
+% Compression Motor
+compVelocity = 0.2;                          % Speed of compression (mm/s)
+compPercent  = 1;                            % Percent of 'current' container size to compress
+compDistance = volumeLen*compPercent/100.0;  % Distance to compress (mm)
+compStep     = -floor(compDistance*10*51200); % Motor steps to compress said distance (steps) [1rev]=[1/10inch], [51200steps/rev]
 
-% Input Parameters For Scan Calculations
-scan_distance   = 90;        % Height(mm) of scanned volume 
-volume_length   = 15.3/2.54; % Length(in) of volume compressed
-containerHeight = 80000;     % Units of (u)
 
-%Input Parameters for compression cell motion
-compVelocity = 0.2;                                    % Speed of compression (mm/s)
-compPercent  = 1;                                       % Percent of 'current' container size to compress
-compDistance = volume_length*CompressionPercent/100.0;  % Distance to compress (mm)
-compSteps    = floor(CompressionDistance*10*51200);     % Motor steps to compress said distance (steps) [1rev]=[1/10inch], [51200steps/rev]
-abort_decel = 50;                                              % Emergency stop deceleration (rps^2)
-
-%% Prep buffers %%
-nearLaserCom = 'COM5'; cameraCom = 'COM2';
-farLaserCom  = 'COM1'; compCom   = 'COM4';
-
-motorsetup;    % Create serial objects s1, s2, s3 
-CompSetup;     % Create serial objects s4
-camSetup;      % Configure camera
-makeDirectory; % Create directory
-disp('Motors and Camera configured')
-
-%% Motor Config %%
-motorTargets = linspace(1,containerHeight,imageCount);
-motorForwardRpm = 200; motorReverseRpm = 20;  % Forward vel (rpm)
+% LaseCam Motors
+motorTargets = linspace(1,containerHeight,imgCount);
+motorForwardRpm = 8;  motorReverseRpm = 20;  % Forward vel (rpm)
 motorForwardAcc = 40;  motorReverseAcc = 10;  % Forward acc (rps^2)
 motorForwardDcc = 40;  motorReverseDcc = 10;  % Forward dcc (rps^2)                                                % Forward dcc (rps^2)
 motorHome = 0;  % Home location
 
-%
-homeLaseCam; 
-fprintf('LaseCam motors homed\n')
+%% Setup Motors%%
+nearLaserCom = 'COM5'; cameraCom = 'COM2';
+farLaserCom  = 'COM1'; compCom   = 'COM4';
 
-disp(preview(vid));
-
-% Scan params
-
+motorsetup;    % Create s1:Near, s2:Camera, s3:Far
+CompSetup;     % Create s4:Comp
+camSetup;      % Configure camera
+makeDirectory; % Create directory
+disp('Motors and Cam setup complete')
 
 %% Execute series of scans %%
 totalScans = 10;
 cntr = 1; tic; startScanMsg;  % Current time
 
 for scanNumber = 1:totalScans
-    
-    
-    homeLaseCam; % Home
-    pause(5);
 
+    homeLaseCam;    % Home Motors
+    pauseMotor;     % Wait for homing
     forwardLaseCam; % Set forward
-    make_scan;      % Scan
-    moveWall(CompressionSteps,s4); % Compress cell
 
-    saveScan;   % Save scan to HDF5
-    pauseMotor; % Pause to for motors to return
+    makeScan; % Scan
+    saveScan; % Save scan to HDF5
+    moveWall; % Compress cell
+    
     estFinish;  % Estimate time till finish
-
     cntr = cntr + 1;
 end
 
 %% Reset %%
-% Video 
+% Video
 stop(vid)
 delete(vid)
 

@@ -23,5 +23,8 @@ vid_src = getselectedsource(vid);
 
 % Set exposure settings                            
 vid_src.ExposureAuto = "Off";
-vid_src.ExposureTime = exposure_time*1000;  % Set exposure time in microseconds
-time_per_frame = exposure_time;             % Find time to obtain each frame
+vid_src.ExposureTime = exposureTime*1000;  % Set exposure time in microseconds
+time_per_frame = exposureTime;             % Find time to obtain each frame
+
+% Show Video
+disp(preview(vid));
