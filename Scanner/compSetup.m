@@ -1,21 +1,25 @@
-%Open serial port
+% Open serial connection
 s4=serialport(compCom,9600,'DataBits',8, 'Parity','none','StopBits',1);
 configureTerminator(s4,"CR")
 
-writeline(s4,'HR'); %start communication
-writeline(s4,'AR'); %Reset alarm just in case
-writeline(s4,'ME'); %Enable motor
+% Activate motor
+writeline(s4,'HR'); % Establish connection
+writeline(s4,'AR'); % Reset alarm
+writeline(s4,'ME'); % Enable motor
 
-%Compute the velocity in rev per sec
+% Compute Vel and Acc in [rev/s], [rev/s^2]
 RevVelocity = compVelocity*10.0/(25.4); %The wall now moves 0.1" per revolution.
-Velocity_command = strcat('VE',num2str(RevVelocity));
 RevACDE = RevVelocity*10;
-Acceleration_command = strcat('AC',num2str(RevACDE));
-Deceleration_command = strcat('DE',num2str(RevACDE));
 
-writeline(s4,Acceleration_command); %Set acceleration in rev/sec^2
-writeline(s4,Deceleration_command); %Set deceleration in rev/sec^2
-writeline(s4,Velocity_command); %Set velocity in rev/sec
+% Command strings to set max's
+velCommand = strcat('VE',num2str(RevVelocity));
+accCommand = strcat('AC',num2str(RevACDE));
+dccCommand = strcat('DE',num2str(RevACDE));
+
+% Send commands
+writeline(s4,velCommand); 
+writeline(s4,accCommand); 
+writeline(s4,dccCommand); 
 writeline(s4,'EG51200'); %Set the microstepping resolution to the maximum
                                %of 51200 microsteps per revolution or 256 
                                %microsteps per real step. The

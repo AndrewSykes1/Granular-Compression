@@ -2,6 +2,9 @@ delete(instrfindall);
 clear s1 s2 s3 s4;
 imaqreset;
 
+% Check what serial devices are available
+serialportlist("available")
+
 nearLaserCom = 'COM5'; cameraCom = 'COM2';
 farLaserCom  = 'COM1'; compCom   = 'COM4';
 s1=serial('COM5');

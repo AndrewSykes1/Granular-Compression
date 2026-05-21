@@ -2,8 +2,7 @@ vid = videoinput('gentl',1,'Mono12Packed');     % Standard glvar setup
 vid.ROIPosition = [LoLimX LoLimY Width Height]; % Crop camera
 
 % Trigger settings
-vid.TriggerRepeat = Inf;           % Enable continous scanning
-vid.FrameGrabInterval = 1;         % Store only every 5th frame
+vid.TriggerRepeat = Inf;   % Enable continous scanning
 
 % Obtain source
 vid_src = getselectedsource(vid);

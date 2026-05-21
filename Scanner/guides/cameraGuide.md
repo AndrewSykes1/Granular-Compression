@@ -1,0 +1,1 @@
+This operation uses the FG-P5G-50S4M-C which is a TeleDyne product. This camera specifically is an IP based camera which is able to be connected to via company provided softwares such as SpinNaker.
