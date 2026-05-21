@@ -13,11 +13,13 @@ for imgNumber = 1:imgCount
         moveto(s3, motorTargets(imgNumber));
         moveto(s2, motorTargets(imgNumber));
         
+        
+
         % Wait for movement
-        fprintf('%.2f\n',motorTargets(imgNumber));
-        fprintf('%.4f\n',motorTargets(2)/(motorForwardRpm*8333)*10);
-        pause(motorTargets(2)/(motorForwardRpm*8333)*10+.5);
-        fprintf('Gap\n');
+        %fprintf('%.2f\n',motorTargets(imgNumber));
+        %fprintf('%.4f\n',motorTargets(2)/(motorForwardRpm*8333)*10);
+        %pause(motorTargets(2)/(motorForwardRpm*8333)*10+.5);
+        %fprintf('Gap\n');
      
 end
 

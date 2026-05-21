@@ -18,7 +18,7 @@ totalScans = 10;   % Number of scans
 LoLimX=0; Width  = 1216;
 LoLimY=0; Height = 1024;
 exposureTime = 50;  % Exposure time (ms)
-imgCount     = 4;  % Number of images in stack
+imgCount     = 100;  % Number of images in stack
 imgStack = zeros(Height, Width, imgCount, 'uint16');
 
 % Compression Motor

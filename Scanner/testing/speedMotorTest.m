@@ -40,6 +40,16 @@ moveto(s1, -pos);
 moveto(s3, pos);
 moveto(s2, pos);
 
+waitfor(s1);
+waitfor(s3);
+waitfor(s2);
+
+moveto(s1, motorHome);
+moveto(s3, motorHome);
+moveto(s2, motorHome);
+
+
+
 dt = pos/(motorForwardRpm*8333)*10;
 fprintf('Waiting %.2f seconds.\n',dt);
 pause(dt);
