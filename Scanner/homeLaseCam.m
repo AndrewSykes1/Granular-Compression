@@ -10,7 +10,7 @@ moveto(s2, motorHome);
 
 % Pause for motion
 timeNeeded = volLen*compPercent/compVelocity;  buffer = 0;
-pause((timeNeeded + buffer));
+pause(timeNeeded + buffer);
 
 % Set to forward
 motorparam(s1, motorForwardRpm, motorForwardAcc, motorForwardDcc, motorAbortDcc);
