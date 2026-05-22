@@ -1,7 +1,12 @@
 % Connect to motors
 s1=serial(nearLaserCom); fopen(s1); % Near Laser
-s2=serial(camCom);    fopen(s2); % Camera
+s2=serial(camCom);       fopen(s2); % Camera
 s3=serial(farLaserCom);  fopen(s3); % Far Laser
+
+% Set command terminator
+s1.Terminator = 'CR';
+s2.Terminator = 'CR';
+s3.Terminator = 'CR';
 
 % Establish stepper mode
 fprintf(s1,'s r0x24 31 \n;');

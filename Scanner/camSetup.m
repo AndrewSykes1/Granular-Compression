@@ -10,7 +10,7 @@ vid_src.Tag = 'particle image';
 
 % Binning by addition
 vid_src.BinningHorizontal = 2;    % Horizontal pixel addition
-vid_src.BinningVertical = 2;      % Verticle pixel addition
+vid_src.BinningVertical = 2;      % Vertical pixel addition
 
 % Set gain
 vid_src.GainAuto = 'Off';

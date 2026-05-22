@@ -27,13 +27,17 @@ dccCommand = strcat('DE',num2str(RevACDE));
 writeline(s4,velCommand); 
 writeline(s4,accCommand); 
 writeline(s4,dccCommand); 
-writeline(s4,'EG51200'); %Set the microstepping resolution to the maximum
-%of 51200 microsteps per revolution or 256 
-%microsteps per real step. The
-%real motor resolution is 200 steps per
-%revolution, i.e. 1.8 deg per step. 
+writeline(s4,'EG51200'); 
 
 %Make data to send
-compStep = -100000;
+compStep = -200000;
 Command=strcat('FL',num2str(compStep));
 writeline(s4,Command);
+
+pause(.2);
+flush(s4);
+writeline(s4, 'SC');  % Input Status
+dog = char(readline(s4));
+display(class(dog));
+
+fprintf('%s\n',dog(6));

@@ -1,3 +1,6 @@
+% Note current Scan
+fprintf("Currently in Scan %d\n",scanNumber);
+
 % Show scan start time
 if scanNumber == 1
     
