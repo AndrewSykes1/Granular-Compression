@@ -12,7 +12,7 @@ imaqreset;
 % General
 volLen     = 6.5;  % Length (in) of volume compressed
 volHeight  = 3.45; % Height (in) of volume's liquid
-totalScans = 2;   % Number of scans       
+totalScans = 100;   % Number of scans       
 
 % Camera
 LoLimX=0; Width  = 1216;

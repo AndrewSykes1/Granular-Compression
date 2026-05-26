@@ -15,7 +15,7 @@ def downscale_data(filePath, dataPath):
 
     # Choose correct coordinates & crop
     data = np.transpose(data,[1,2,0]) # (rows, width, slices)
-    croppedData = data[200:2448][200:2048][200:2184] #croppedData = data[150:1100,50:970,:]
+    croppedData = data[200:2448][200:2048][200:2184] 
 
     # Rescale and save
     rescaleData = zoom(croppedData, 0.25)
@@ -26,7 +26,7 @@ def downscale_data(filePath, dataPath):
 
 
 # Find files
-os.chdir(r'C:\Users\Lab User\Desktop\temp1\Granular-Compression') #os.chdir('/home/snow/Coding/Granular-Compression')
+os.chdir(r'C:\Users\Lab User\Desktop\temp1\Granular-Compression') 
 file = r"Data/Scan_17.hdf5"
 dataset = r'/RawData/Scan_17'
 
