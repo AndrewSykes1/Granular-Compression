@@ -11,14 +11,20 @@ disp(['Moving wall: ' , num2str(compStep)]);
 compStep = -1*compStep; 
 
 % Clear buffer
-pause(.1); flush(s4);
+pause(.01); flush(s4);
 
 % Wait until motor halts
-while true
-    writeline(s4, 'SC');  % Input Status
-    response = char(readline(s4));
+try
+    while true
+        writeline(s4, 'SC');  % Input Status
+        response = char(readline(s4));
 
-    if str2num(response(6)) ~= 1
-        break
+        if str2num(response(6)) ~= 1
+            break
+        end
     end
+catch
+    fprintf('Response: %s\n',response);
+    fprintf('Response(6): %s\n',response(6));
+    fprintf('Num Response(6): %s\n',str2num(response(6)));
 end

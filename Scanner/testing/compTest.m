@@ -15,8 +15,10 @@ writeline(s4,'AR'); % Reset alarm
 writeline(s4,'ME'); % Enable motor
 
 % Compute Vel:[rev/s] and Acc:[rev/s^2]
-RevVelocity = compVelocity*10.0/(25.4); %The wall now moves 0.1" per revolution.
+RevVelocity = compVelocity*10.0; %The wall now moves 0.1" per revolution.
 RevACDE = RevVelocity*10;
+
+display(RevVelocity);
 
 % Command strings to set max's
 velCommand = strcat('VE',num2str(RevVelocity));

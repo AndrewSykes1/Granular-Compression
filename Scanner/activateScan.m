@@ -7,32 +7,36 @@ delete(instrfindall);
 clear all;
 imaqreset;
 
+
 %% Establish constants %%
 
 % General
-volLen     = 6.5;  % Length (in) of volume compressed
-volHeight  = 3.45; % Height (in) of volume's liquid
-totalScans = 100;   % Number of scans       
+volWidth   = 6.50; % Compression axis (in)
+volHeight  = 6.00; % Horizontal plane length
+volLength  = 5.00; % Vertical fluid height
+compDepth  = 0.50; % Plate thickness
+totalScans = 100;  % Number of scans       
 
 % Camera
 LoLimX=0; Width  = 1216;
 LoLimY=0; Height = 1024;
-exposureTime = 50;  % Exposure time (ms)
-imgCount     = 1000;  % Number of images in stack
-imgStack = zeros(Height, Width, imgCount, 'uint16');
+pxDensity = (Width/(volWidth+compDepth) + Height/volHeight)/2;
+imgCount  = int32(pxDensity*volLength);  % Number of images in stack
+imgStack  = zeros(Height, Width, imgCount, 'uint16');
 
 % Compression Motor
 compConv  = 500000; % Conversion of (microstep/in)
-compVelocity = 0.1; % Speed of compression (in/s)
+compVelocity = 0.78; % Speed of compression (in/s)
 compPercent  = .10; % Percent of container to compress
-compStep = floor(volLen*compPercent*compConv); % Motor steps to compress said distance (steps) [1rev]=[1/10inch], [51200steps/rev],[512000steps/in]
+compStep = floor(volWidth*compPercent*compConv); % Motor steps to compress said distance (steps) [1rev]=[1/10inch], [51200steps/rev],[512000steps/in]
 
 % LaseCam Motors
-motorTargets = linspace(1,volHeight*12800,imgCount); % [12800u/in]
+motorTargets = linspace(1,volLength*12800,imgCount); % [12800u/in]
 motorForwardRpm = 8;   motorReverseRpm = 20;  % Forward vel (rpm)
 motorForwardAcc = 40;  motorReverseAcc = 10;  % Forward acc (rps^2)
 motorForwardDcc = 40;  motorReverseDcc = 10;  % Forward dcc (rps^2)
 motorHome = 0;         motorAbortDcc   = 50;  
+
 
 %% Setup Motors %%
 nearLaserCom = 'COM5'; camCom  = 'COM2';
@@ -44,6 +48,7 @@ camSetup;   % Configure camera
 
 makeDirectory; % Create directory
 disp('Motors and Cam setup complete')
+
 
 %% Execute series of scans %% 
 for scanNumber = 1:totalScans

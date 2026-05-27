@@ -2,7 +2,7 @@ function finishMove(mtr)
     while(true)
         
         % Flush outputs
-        pause(0.1); 
+        pause(0.01); 
         flushinput(mtr);
     
         % Access movement status

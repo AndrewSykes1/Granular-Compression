@@ -2,29 +2,31 @@ delete(instrfindall); close all;
 clear s1 s2 s3 s4 vid vid_src;
 imaqreset;
 
-  % 50ms for exposure time
+% General
+volLen     = 6.5;  % Length (in) of volume compressed
+volHeight  = 3.45; % Height (in) of volume's liquid
+totalScans = 100;   % Number of scans       
 
-% Image capture region
-LoLimX=0;
-LoLimY=0;
-Width = 1224;
-Height = 1024;   
+% Camera
+LoLimX=0; Width  = 1216;
+LoLimY=0; Height = 1024;
+exposureTime = 50;  % Exposure time (ms)
+imgCount     = 1000;  % Number of images in stack
+imgStack = zeros(Height, Width, imgCount, 'uint16');
 
-%% Config Camera %%
 vid = videoinput('gentl',1,'Mono12Packed');     % Standard glvar setup
 vid.ROIPosition = [LoLimX LoLimY Width Height]; % Crop camera
 
 % Trigger settings
-vid.TriggerRepeat = Inf;           % Enable continous scanning
-vid.FrameGrabInterval = 1;         % Store only every 5th frame
+vid.TriggerRepeat = Inf;   % Enable continuous scanning
 
 % Obtain source
 vid_src = getselectedsource(vid);
 vid_src.Tag = 'particle image';
 
-% Pooling by addition
+% Binning by addition
 vid_src.BinningHorizontal = 2;    % Horizontal pixel addition
-vid_src.BinningVertical = 2;      % Verticle pixel addition
+vid_src.BinningVertical = 2;      % Vertical pixel addition
 
 % Set gain
 vid_src.GainAuto = 'Off';
@@ -34,25 +36,10 @@ vid_src.Gain = 0;
 start(vid);
 vid_src = getselectedsource(vid);
 
-exposure_time = 50; %ms 
 % Set exposure settings                            
 vid_src.ExposureAuto = "Off";
-vid_src.ExposureTime = exposure_time*1000;  % Set exposure time in microseconds
-time_per_frame = exposure_time;             % Find time to obtain each frame
-disp('Camera configured')
+vid_src.ExposureTime = exposureTime*1000;  % Set exposure time in microseconds
+time_per_frame = exposureTime;             % Find time to obtain each frame
 
-preview(vid);
-
-fprintf("Attempted Framerate: %.2f", vid_src.AcquisitionFrameRate);
-
-%get(vid_src);
-%propinfo(vid_src);
-
-imageNumber = 0;
-while true
-    %Take one frame
-
-    get(vid, 'FramesAvailable');
-    getdata(vid,1);
-    imageNumber = imageNumber + 1;
-end
+% Show Video
+disp(preview(vid));

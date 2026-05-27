@@ -2,7 +2,7 @@ vid = videoinput('gentl',1,'Mono12Packed');     % Standard glvar setup
 vid.ROIPosition = [LoLimX LoLimY Width Height]; % Crop camera
 
 % Trigger settings
-vid.TriggerRepeat = Inf;   % Enable continous scanning
+vid.TriggerRepeat = Inf;   % Enable continuous scanning
 
 % Obtain source
 vid_src = getselectedsource(vid);
@@ -20,7 +20,8 @@ vid_src.Gain = 0;
 start(vid);
 vid_src = getselectedsource(vid);
 
-% Set exposure settings                            
+% Set exposure settings 
+exposureTime = 50;  % (ms)
 vid_src.ExposureAuto = "Off";
 vid_src.ExposureTime = exposureTime*1000;  % Set exposure time in microseconds
 time_per_frame = exposureTime;             % Find time to obtain each frame

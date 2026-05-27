@@ -8,7 +8,7 @@ writeline(s4,'AR'); % Reset alarm
 writeline(s4,'ME'); % Enable motor
 
 % Compute Vel:[rev/s] and Acc:[rev/s^2]
-ustepVelo = compVelocity*compConv;
+ustepVelo = compVelocity;
 ustepACDE = ustepVelo*10;
 
 % Command strings to set max's
