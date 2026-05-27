@@ -25,9 +25,9 @@ imgCount  = int32(pxDensity*volLength);  % Number of images in stack
 imgStack  = zeros(Height, Width, imgCount, 'uint16');
 
 % Compression Motor
-compConv  = 500000; % Conversion of (microstep/in)
+compConv  = 500000;  % Conversion of (microstep/in)
 compVelocity = 0.78; % Speed of compression (in/s)
-compPercent  = .10; % Percent of container to compress
+compPercent  = 0.10; % Percent of container to compress
 compStep = floor(volWidth*compPercent*compConv); % Motor steps to compress said distance (steps) [1rev]=[1/10inch], [51200steps/rev],[512000steps/in]
 
 % LaseCam Motors
