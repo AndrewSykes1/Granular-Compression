@@ -1,9 +1,9 @@
-function saveHDF5(data,scanNum,path)
+function saveHDF5(data,cycleNum,subCycleNum,path)
 
 % File name and save location
-scanString  = strcat('Scan_',num2str(scanNum));
-datasetName = strcat('/RawData/',scanString);
-filePath    = strcat(path,scanString,'.hdf5');
+cycleString = strcat('Cycle',num2str(cycleNum),'s',num2str(subCycleNum));
+datasetName = strcat('/RawData/',cycleString);
+filePath    = strcat(path,cycleString,'.hdf5');
 
 % Define database's shape
 dataSize  = size(data);

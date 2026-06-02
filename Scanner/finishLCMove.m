@@ -1,0 +1,25 @@
+function finishLCMove(mtr)
+    while(true)
+        
+        % Flush outputs
+        pause(0.05); 
+        flushinput(mtr);
+    
+        % Access movement status
+        cmd = sprintf('g r0xa0 \r');
+        fprintf(mtr,cmd);
+
+        % Parse for status
+        retInfo = strsplit(fscanf(mtr));
+        status = str2double(retInfo{2});
+
+        % Exit if stationary
+        try
+            if bitand(status,134217728) == 0
+                break;
+            end
+        catch
+            fprintf('Error in bitand process with input of: %s', retInfo);
+        end
+    end
+end

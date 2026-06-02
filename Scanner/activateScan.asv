@@ -2,20 +2,24 @@
 warning('off', 'instrument:serial:ClassToBeRemoved');
 warning('off', 'instrument:instrfindall:FunctionToBeRemoved');
 
+% If some variable exists, then do X, if not, then define some group of
+% variables
+
 % Delete all serial and camera objects in memory
 delete(instrfindall);
 clear all;
 imaqreset;
 
 
-%% Establish constants %%
+%% Establish constants
 
 % General
 volWidth   = 6.50; % Compression axis (in)
 volHeight  = 6.00; % Horizontal plane length
 volLength  = 5.00; % Vertical fluid height
 compDepth  = 0.50; % Plate thickness
-totalScans = 100;  % Number of scans       
+totalCycles = 100; % Number of Cycles
+resShift   = 16;    % How many scans before shifting to low res cycles
 
 % Camera
 LoLimX=0; Width  = 1216;
@@ -25,20 +29,23 @@ imgCount  = int32(pxDensity*volLength);  % Number of images in stack
 imgStack  = zeros(Height, Width, imgCount, 'uint16');
 
 % Compression Motor
-compConv  = 500000; % Conversion of (microstep/in)
+compConv  = 500000;  % Conversion of (microstep/in)
 compVelocity = 0.78; % Speed of compression (in/s)
-compPercent  = .10; % Percent of container to compress
+compPercent  = 0.10; % Percent of container to compress
 compStep = floor(volWidth*compPercent*compConv); % Motor steps to compress said distance (steps) [1rev]=[1/10inch], [51200steps/rev],[512000steps/in]
+resHighCnt = 4; % How many steps for "high res scan"
+resLowCnt  = 2; % How many steps for "low res scan"
+[lowTargets, highTargets] = compStepArray(compStep,resLowCnt,resHighCnt);
 
 % LaseCam Motors
-motorTargets = linspace(1,volLength*12800,imgCount); % [12800u/in]
+motorTargets = round(linspace(1,volLength*12800,imgCount)); % [12800u/in]
 motorForwardRpm = 8;   motorReverseRpm = 20;  % Forward vel (rpm)
 motorForwardAcc = 40;  motorReverseAcc = 10;  % Forward acc (rps^2)
 motorForwardDcc = 40;  motorReverseDcc = 10;  % Forward dcc (rps^2)
-motorHome = 0;         motorAbortDcc   = 50;  
+motorAbortDcc   = 50;  
 
 
-%% Setup Motors %%
+%% Setup Motors
 nearLaserCom = 'COM5'; camCom  = 'COM2';
 farLaserCom  = 'COM1'; compCom = 'COM4';
 
@@ -50,13 +57,25 @@ makeDirectory; % Create directory
 disp('Motors and Cam setup complete')
 
 
-%% Execute series of scans %% 
-for scanNumber = 1:totalScans
-    timeInfo;    % Show time estimates
+%% Execute series of cycles
+for cycleNumber = 1:totalCycles
+    homeLaseCam;
 
-    homeLaseCam; % Home LaseCam
-    makeScan;    % Scan volume
-    moveWall;    % Compress cell
+    % Use low res targets
+    if cycleNumber <= resShift
+        for idx = 1:length(lowTargets)
+            moveWall(s4,lowTargets(idx));
+            makeScan;
+        end
+
+    % Use high res targets
+    elseif cycleNumber > resShift 
+        for idx = 1:length(highTargets)
+            moveWall(s4,highTargets(idx));
+            makeScan;
+        end
+    end
+
 end
 
 % Inform of completion

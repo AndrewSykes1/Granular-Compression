@@ -1,4 +1,4 @@
-function finishMove(mtr)
+function finishLCMove(mtr)
     while(true)
         
         % Flush outputs
@@ -13,10 +13,12 @@ function finishMove(mtr)
         retInfo = strsplit(fscanf(mtr));
         status = str2double(retInfo{2});
 
-        % Return status
-        if bitand(status,134217728) == 0
-            break;
-        end
-
+        % Exit if stationary
+        try
+            if bitand(status,134217728) == 0
+                break;
+            end
+        catch
+            fprintf('Error in bitand process with input of: %s',)
     end
 end
