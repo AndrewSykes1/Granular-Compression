@@ -19,8 +19,6 @@ def saveData(data, location, saveName):
     # Change directory to save location
     path = os.path.join(location,saveName)
 
-    # Flatten and save data
-    flatData = np.concatenate([np.ravel(slice_) for slice_ in data])
+    # Save data
     with h5py.File(path, 'w') as f: 
-        f.create_dataset("default", data=flatData)
-        f.attrs["shape"] = data.shape
+        f.create_dataset("default", data=data)
