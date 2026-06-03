@@ -15,7 +15,7 @@ def axialNormalization(data, axis='c'):
     'r': [(1,2), sR, (slice(None), np.newaxis, np.newaxis)],
     'c': [(0,2), sC, (np.newaxis, slice(None), np.newaxis)],
     'z': [(0,1), sZ, (np.newaxis, np.newaxis, slice(None))]
-}
+    }
     
     info = collapseDict[axis]
     axialMeans = np.mean(data,axis=info[0])

@@ -17,10 +17,9 @@ def loadData(location, fileName, database='default'):
     # File location
     path = os.path.join(location,fileName)
 
-    # Load and unflatten file
+    # Load file
     with h5py.File(f'{path}','r') as f: 
         data = f[database][()] # (slices, rows, width)
-        data = data.reshape(f.attrs["shape"])
     
     return data
 
