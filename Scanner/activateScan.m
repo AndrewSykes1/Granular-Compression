@@ -16,10 +16,10 @@ imaqreset;
 % General
 volWidth   = 6.50; % Compression axis (in)
 volHeight  = 6.00; % Horizontal plane length
-volLength  = 5.00; % Vertical fluid height
+volLength  = 5.75; % Vertical fluid height
 compDepth  = 0.50; % Plate thickness
 totalCycles = 100; % Number of Cycles
-resShift   = 16;    % How many scans before shifting to low res cycles
+resShift   = 2;    % How many scans before shifting to low res cycles
 
 % Camera
 LoLimX=0; Width  = 1216;
@@ -36,6 +36,9 @@ compStep = floor(volWidth*compPercent*compConv); % Motor steps to compress said 
 resHighCnt = 4; % How many steps for "high res scan"
 resLowCnt  = 2; % How many steps for "low res scan"
 [lowTargets, highTargets] = compStepArray(compStep,resLowCnt,resHighCnt);
+
+disp(highTargets);
+disp(length(highTargets));
 
 % LaseCam Motors
 motorTargets = round(linspace(1,volLength*12800,imgCount)); % [12800u/in]
@@ -80,7 +83,7 @@ for cycleNumber = 1:totalCycles
         end
     end
 
-
+    fprintf('Completed cycle: %d', cycleNumber);
 
 end
 
