@@ -19,7 +19,7 @@ volHeight  = 6.00; % Horizontal plane length
 volLength  = 5.75; % Vertical fluid height
 compDepth  = 0.50; % Plate thickness
 totalCycles = 100; % Number of Cycles
-resShift   = 2;    % How many scans before shifting to low res cycles
+resShift   = 10;    % How many scans before shifting to low res cycles
 
 % Camera
 LoLimX=0; Width  = 1216;
@@ -33,8 +33,8 @@ compConv  = 500000;  % Conversion of (microstep/in)
 compVelocity = 0.78; % Speed of compression (in/s)
 compPercent  = 0.10; % Percent of container to compress
 compStep = floor(volWidth*compPercent*compConv); % Motor steps to compress said distance (steps) [1rev]=[1/10inch], [51200steps/rev],[512000steps/in]
-resHighCnt = 4; % How many steps for "high res scan"
-resLowCnt  = 2; % How many steps for "low res scan"
+resHighCnt = 8; % How many steps for "high res scan"
+resLowCnt  = 4; % How many steps for "low res scan"
 [lowTargets, highTargets] = compStepArray(compStep,resLowCnt,resHighCnt);
 
 disp(highTargets);
