@@ -14,12 +14,12 @@ imaqreset;
 %% Establish constants
 
 % General
-volWidth   = 6.50; % Compression axis (in)
-volHeight  = 6.00; % Horizontal plane length
-volLength  = 5.75; % Vertical fluid height
-compDepth  = 0.50; % Plate thickness
-totalCycles = 100; % Number of Cycles
-resShift   = 10;    % How many scans before shifting to low res cycles
+volWidth    = 6.50; % Compression axis (in)
+volHeight   = 6.00; % Horizontal plane length
+volLength   = 5.75; % Vertical fluid height
+compDepth   = 0.50; % Plate thickness
+totalCycles = 200;  % Number of Cycles
+resShift    = 10;   % How many cycles before shifting to low res cycles
 
 % Camera
 LoLimX=0; Width  = 1216;
@@ -33,12 +33,9 @@ compConv  = 500000;  % Conversion of (microstep/in)
 compVelocity = 0.78; % Speed of compression (in/s)
 compPercent  = 0.10; % Percent of container to compress
 compStep = floor(volWidth*compPercent*compConv); % Motor steps to compress said distance (steps) [1rev]=[1/10inch], [51200steps/rev],[512000steps/in]
-resHighCnt = 8; % How many steps for "high res scan"
-resLowCnt  = 4; % How many steps for "low res scan"
+resHighCnt = 8; % How many scans for "high res cycle"
+resLowCnt  = 4; % How many scans for "low res cycle"
 [lowTargets, highTargets] = compStepArray(compStep,resLowCnt,resHighCnt);
-
-disp(highTargets);
-disp(length(highTargets));
 
 % LaseCam Motors
 motorTargets = round(linspace(1,volLength*12800,imgCount)); % [12800u/in]
@@ -64,26 +61,26 @@ disp('Motors and Cam setup complete')
 for cycleNumber = 1:totalCycles
     homeLaseCam;
 
-    % Use high res targets
-    if cycleNumber <= resShift 
-        for idx = 1:length(highTargets)
-            moveWall(s4,highTargets(idx));
-            if idx ~= length(highTargets)
+    % Use high res targets for first and last 10 cycles
+    if cycleNumber <= resShift || cycleNumber >= (totalCycles-resShift)
+        for i = 1:length(highTargets)
+            moveWall(s4,highTargets(i));
+            if i < length(highTargets)
                 makeScan;
             end
         end
 
-    % Use low res targets
+    % Use low res targets for all other cycles
     elseif cycleNumber > resShift
-        for idx = 1:length(lowTargets)
-            moveWall(s4,lowTargets(idx));
-            if idx ~= length(lowTargets)
+        for i = 1:length(lowTargets)
+            moveWall(s4,lowTargets(i));
+            if i < length(lowTargets)
                 makeScan;
             end
         end
     end
 
-    fprintf('Completed cycle: %d', cycleNumber);
+    fprintf('Completed cycle: %d\n', cycleNumber);
 
 end
 

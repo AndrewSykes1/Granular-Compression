@@ -19,7 +19,7 @@ for imgNumber = 1:imgCount
     flushdata(vid);
 end
 
-% Save odd scans
+% Save scans
 subCycleNum = idx;
 saveHDF5(imgStack, cycleNumber, subCycleNum,  experimentFolder);
 
