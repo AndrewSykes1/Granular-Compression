@@ -20,7 +20,7 @@ for imgNumber = 1:imgCount
 end
 
 % Save scans
-subCycleNum = idx;
+subCycleNum = i;
 saveHDF5(imgStack, cycleNumber, subCycleNum,  experimentFolder);
 
 

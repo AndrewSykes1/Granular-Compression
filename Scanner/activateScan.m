@@ -16,7 +16,7 @@ imaqreset;
 % General
 volWidth    = 6.50; % Compression axis (in)
 volHeight   = 6.00; % Horizontal plane length
-volLength   = 5.75; % Vertical fluid height
+volLength   = 7; % Vertical fluid height (5.5 usually)
 compDepth   = 0.50; % Plate thickness
 totalCycles = 200;  % Number of Cycles
 resShift    = 10;   % How many cycles before shifting to low res cycles
@@ -46,8 +46,8 @@ motorAbortDcc   = 50;
 
 
 %% Setup Motors
-nearLaserCom = 'COM5'; camCom  = 'COM2';
-farLaserCom  = 'COM1'; compCom = 'COM4';
+nearLaserCom = 'COM9'; camCom  = 'COM6';
+farLaserCom  = 'COM1'; compCom = 'COM8';
 
 motorSetup; % Create s1:Near, s2:Camera, s3:Far
 compSetup;  % Create s4:Comp

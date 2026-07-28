@@ -1,5 +1,5 @@
 % Global experiment directory
-saveDirectory = 'D:\ModernExperiments\';
+saveDirectory = 'D:\Users\Lab User\Desktop\ModernExperiments\';
 
 % Make folder name 
 info = string({dir(saveDirectory).name}); % List of exp folders
